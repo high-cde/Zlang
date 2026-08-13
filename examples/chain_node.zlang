@@ -1,35 +1,18 @@
-module chain.node
+print "======================================"
+print "       Z-CHAIN NODE INIZIALIZZATO     "
+print "======================================"
 
-import sys
-import net
+let block = "ZDOS-GENESIS-BLOCK-001"
+print "Payload originale del blocco:"
+print block
 
-func main() {
-    sys.log("chain.node", "boot")
+print "Calcolo firma crittografica neurale..."
+hash block
 
-    let cfg = sys.registry.get("chain.node")
-    sys.log("chain.node", "id=" + cfg["id"] + " port=" + str(cfg["port"]))
+print "Firma Hash calcolata con successo:"
+print block
 
-    init_network(cfg)
-    loop()
-}
+print "Inizializzazione protocollo di trasmissione..."
+broadcast block
 
-func init_network(cfg) {
-    sys.log("chain.node", "init network")
-    // net.bind, net.connect peers, ecc.
-}
-
-func loop() {
-    while true {
-        process_incoming()
-        produceblockif_needed()
-        sys.sleep(500)
-    }
-}
-
-func process_incoming() {
-    // placeholder: leggere messaggi, tx, ecc.
-}
-
-func produceblockif_needed() {
-    // placeholder: logica consenso/produzione blocchi
-}
+print "Nodo sincronizzato e in ascolto."

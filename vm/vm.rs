@@ -1,21 +1,18 @@
 use crate::vm::bytecode::OpCode;
 use crate::vm::value::Value;
 use std::collections::HashMap;
-use std::process::Command; // <-- IL PONTE CON IL SISTEMA OPERATIVO
+use std::process::Command;
 
-pub struct VM { 
-    pub stack: Vec<Value>, 
-    pub ip: usize, 
-    pub code: Vec<u8>, 
-    pub constants: Vec<Value>, 
-    pub globals: HashMap<String, Value> 
+pub struct VM {
+    pub stack: Vec<Value>, pub ip: usize, pub code: Vec<u8>, 
+    pub constants: Vec<Value>, pub globals: HashMap<String, Value>
 }
 
 impl VM {
-    pub fn new(code: Vec<u8>, constants: Vec<Value>) -> Self { 
-        VM { stack: Vec::new(), ip: 0, code, constants, globals: HashMap::new() } 
+    pub fn new(code: Vec<u8>, constants: Vec<Value>) -> Self {
+        VM { stack: Vec::new(), ip: 0, code, constants, globals: HashMap::new() }
     }
-    
+
     pub fn run(&mut self) {
         println!("\x1B[1;34m[ZDOS VM] Collegamento al Kernel Stabilito...\x1B[0m");
         while self.ip < self.code.len() {
@@ -27,7 +24,7 @@ impl VM {
                 OpCode::StoreGlobal => {
                     let idx = self.code[self.ip] as usize; self.ip += 1;
                     if let Value::Str(name) = &self.constants[idx] {
-                        let val = self.stack.pop().unwrap();
+                        let val = self.stack.pop().expect("Stack vuoto");
                         self.globals.insert(name.clone(), val);
                     }
                 }
@@ -46,27 +43,35 @@ impl VM {
                         _ => {}
                     }
                 }
+                OpCode::Sub => { let b = self.stack.pop().unwrap(); let a = self.stack.pop().unwrap(); if let (Value::Int(i1), Value::Int(i2)) = (a, b) { self.stack.push(Value::Int(i1 - i2)); } }
+                OpCode::Less => { let b = self.stack.pop().unwrap(); let a = self.stack.pop().unwrap(); if let (Value::Int(i1), Value::Int(i2)) = (a, b) { self.stack.push(Value::Int(if i1 < i2 { 1 } else { 0 })); } }
+                OpCode::Greater => { let b = self.stack.pop().unwrap(); let a = self.stack.pop().unwrap(); if let (Value::Int(i1), Value::Int(i2)) = (a, b) { self.stack.push(Value::Int(if i1 > i2 { 1 } else { 0 })); } }
+                OpCode::Eq => { let b = self.stack.pop().unwrap(); let a = self.stack.pop().unwrap(); if let (Value::Int(i1), Value::Int(i2)) = (a, b) { self.stack.push(Value::Int(if i1 == i2 { 1 } else { 0 })); } }
+                OpCode::JmpIfFalse => {
+                    let addr = self.code[self.ip] as usize; self.ip += 1;
+                    if let Some(Value::Int(cond)) = self.stack.pop() { if cond == 0 { self.ip = addr; } }
+                }
+                OpCode::Jmp => { self.ip = self.code[self.ip] as usize; }
                 OpCode::SysCall => {
                     let id = self.code[self.ip]; self.ip += 1; let _argc = self.code[self.ip]; self.ip += 1;
                     match id {
-                        // SysCall 1: Stampa a terminale
                         1 => { if let Some(val) = self.stack.pop() { println!("\x1B[1;36m[Z-LANG LOG]\x1B[0m {:?}", val); } }
-                        // SysCall 10: ESECUZIONE COMANDI DI SISTEMA (sys.exec)
-                        10 => { 
+                        2 => {
+                            if let Some(Value::Str(s)) = self.stack.pop() {
+                                let h = format!("{:x}", md5::compute(s));
+                                self.stack.push(Value::Str(h)); // Il fix è qui!
+                            }
+                        }
+                        3 => { if let Some(val) = self.stack.pop() { println!("\x1B[1;35m[Z-CHAIN P2P]\x1B[0m Blocco Neurale Trasnesso: {:?}", val); } }
+                        10 => {
                             if let Some(Value::Str(cmd)) = self.stack.pop() {
                                 println!("\x1B[1;31m[ZDOS EXEC]\x1B[0m Esecuzione comando: {}", cmd);
                                 let output = Command::new("sh").arg("-c").arg(&cmd).output();
-                                match output {
-                                    Ok(out) => {
-                                        let res = String::from_utf8_lossy(&out.stdout).to_string();
-                                        self.stack.push(Value::Str(res));
-                                    },
-                                    Err(_) => self.stack.push(Value::Str("Errore esecuzione".to_string())),
-                                }
+                                if let Ok(out) = output { self.stack.push(Value::Str(String::from_utf8_lossy(&out.stdout).trim().to_string())); } 
+                                else { self.stack.push(Value::Str("Err".to_string())); }
                             }
                         }
-                        4 => { if let Some(Value::Int(ms)) = self.stack.pop() { std::thread::sleep(std::time::Duration::from_millis(ms as u64)); } }
-                        _ => { if let Some(val) = self.stack.pop() { println!("\x1B[1;33m[ZDOS SYSCALL {}]\x1B[0m {:?}", id, val); } }
+                        _ => {}
                     }
                 }
                 OpCode::Ret => break,

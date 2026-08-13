@@ -1,0 +1,18 @@
+print "--- INIZIO TEST LOGICO Z-LANG ---"
+let contatore = 0
+
+print "Test ciclo while in corso..."
+while contatore < 3 {
+    print "Iterazione:"
+    print contatore
+    contatore = contatore + 1
+}
+
+print "Test salto condizionale if/else..."
+if contatore == 3 {
+    print "Condizione VERA: Il contatore ha raggiunto il valore 3. Successo!"
+} else {
+    print "Condizione FALSA: Errore critico di calcolo."
+}
+
+print "--- TEST COMPLETATO ---"
