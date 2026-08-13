@@ -1,0 +1,9 @@
+print "======================================"
+print "   ZDOS DAEMON LOGGER INIZIALIZZATO   "
+print "======================================"
+
+print "Avvio monitoraggio di sistema..."
+exec "date"
+exec "free -m"
+
+print "Demone in ascolto. ZDOS operativo."

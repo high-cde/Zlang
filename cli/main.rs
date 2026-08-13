@@ -1,33 +1,13 @@
-use zlang_core::compiler::codegen::Codegen;
-use zlang_core::compiler::lexer::Lexer;
-use zlang_core::compiler::parser::Parser;
+use std::{env, fs};
+use zlang_core::compiler::{codegen::Codegen, lexer::Lexer, parser::Parser};
 use zlang_core::vm::vm::VM;
-
 fn main() {
-    println!("ZLang CLI v0.1.0 - Full Test");
-
-    let inputs = vec![
-        "let a = 10 + 20",
-        "let b = \"ZDOS \" + \"ZLang\"",
-        "let c = 100 - 50 + 25",
-    ];
-
-    for input in inputs {
-        println!("\nTesting: {}", input);
-        let lexer = Lexer::new(input);
-        let mut parser = Parser::new(lexer);
-        let stmts = parser.parse_program();
-
-        let mut codegen = Codegen::new();
-        codegen.compile(&stmts);
-
-        let mut vm = VM::new(codegen.code, codegen.constants);
-        vm.run();
-
-        if let Some(result) = vm.stack.last() {
-            println!("Result: {:?}", result);
-        } else {
-            println!("No result (stack empty)");
-        }
-    }
+    let args: Vec<String> = env::args().collect();
+    if args.len() < 2 { println!("ZDOS Z-Lang v0.2.0"); return; }
+    let input = fs::read_to_string(&args[1]).unwrap();
+    let mut parser = Parser::new(Lexer::new(&input));
+    let stmts = parser.parse_program();
+    let mut codegen = Codegen::new();
+    codegen.compile(&stmts);
+    VM::new(codegen.code, codegen.constants).run();
 }

@@ -1,0 +1,5 @@
+print "Inizializzazione test di dominio sistema..."
+exec "uname -a"
+exec "uptime"
+let z = "ZDOS Sovereign Control Attivo"
+print z
