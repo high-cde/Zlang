@@ -1,0 +1,12 @@
+print "======================================"
+print "   ZDOS SYSTEM DAEMON ATTIVO        "
+print "======================================"
+
+let cicli = 0
+while cicli < 2 {
+    print "Monitoraggio risorse in corso..."
+    exec "uptime"
+    cicli = cicli + 1
+}
+
+print "Demone in stato di standby permanente."

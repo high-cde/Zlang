@@ -1,0 +1,16 @@
+print "======================================"
+print "   Z-CHAIN LEDGER WRITER            "
+print "======================================"
+
+let block_data = "ZDOS-TRANSACTION-BLOCK-999"
+print "Dati blocco originali:"
+print block_data
+
+print "Generazione firma SHA/MD5..."
+hash block_data
+
+print "Scrittura blocco firmato sul registro locale..."
+# Sfruttiamo exec per scrivere l'output nel file di ledger della blockchain
+exec "echo 'BLOCK_HASH: 186c2d8295c59f9cae8b047edd3acf08' >> /opt/zdos/chain_ledger.dat"
+
+print "Registro aggiornato con successo su /opt/zdos/chain_ledger.dat"
