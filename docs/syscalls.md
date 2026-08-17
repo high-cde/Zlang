@@ -24,6 +24,9 @@ Una syscall ZDOS potrà entrare in una versione successiva solo con tutti i segu
 | Registry | `RegistryRead`, `RegistryWrite` con scope key | Non implementata |
 | Networking | `NetConnect`, `NetSend`, `NetReceive` con endpoint policy | Non implementata |
 | Eventi e tempo | `EventEmit`, `ClockRead` | Non implementata |
-| Ledger/Z-Chain | `LedgerSubmit` con policy firmata | Non implementata |
+| Query Z-Chain | `ZChainRead` con policy deny-by-default, adapter host e audit append-only | Specificata, disabilitata nel core |
+| Ledger/Z-Chain mutante | `LedgerSubmit` con policy firmata e workflow di firma separato | Non implementata |
 
 > Una richiesta proveniente da un sorgente ZLang, modulo bytecode o canale remoto non riceverà accesso host implicito. L’ABI futuro resterà deny-by-default e potrà essere abilitato soltanto dalla policy del deployer.
+
+La proposta [ZChainRead](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/ZCHAINREAD-SECURITY-POLICY.md) definisce il primo profilo di query: chain/query/endpoint/target allowlisted, quote, TLS, validazione della risposta e audit hash-chained. Non concede firma, submit o accesso a chiavi.

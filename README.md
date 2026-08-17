@@ -27,6 +27,8 @@
 
 Il core è progettato come fondazione verificabile. Funzioni, moduli, stringhe, collection, rete, filesystem, processi, registry, Z-Chain e ZPM **non sono implementati nel runtime v1** e restano soggetti a proposte, capability, limiti, test e versionamento espliciti.
 
+La prima capability Z-Chain progettata è [`ZChainRead`](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/ZCHAINREAD-SECURITY-POLICY.md): una query read-only deny-by-default, vincolata a modulo, policy firmata, chain, query, endpoint, quota, TLS e audit append-only. È una **specifica di integrazione futura**, non un permesso attivo nella VM corrente.
+
 ## Filiera di esecuzione
 
 ```mermaid
@@ -121,6 +123,7 @@ Zlang/
 - [Core language v1](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/language-spec.md)
 - [Bytecode ZREG v1](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/bytecode-spec.md)
 - [Checklist prima release stabile](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/STABLE-RELEASE-CHECKLIST.md)
+- [Policy e audit ZChainRead](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/ZCHAINREAD-SECURITY-POLICY.md)
 - [Security policy](https://raw.githubusercontent.com/high-cde/Zlang/main/SECURITY.md)
 - [Whitepaper](https://raw.githubusercontent.com/high-cde/Zlang/main/ZLANG-WHITEPAPER.md)
 

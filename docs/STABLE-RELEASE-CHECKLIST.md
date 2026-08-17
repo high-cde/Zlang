@@ -85,6 +85,8 @@ La prima release stabile può essere priva di syscall privilegiate reali, ma non
 | P0-43 | Logging di audit per syscall abilitate | Evento con script, versione, richiesta ed esito |
 | P0-44 | Policy di disclosure delle vulnerabilità | `SECURITY.md` verificato e contatto di sicurezza attivo |
 | P0-45 | Dipendenze analizzate per vulnerabilità note | `cargo audit` o alternativa documentata in CI/release |
+| P0-46 | `ZChainRead` resta disabilitata finché ABI, policy, adapter e audit non sono completi | Review contro [policy ZChainRead](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/ZCHAINREAD-SECURITY-POLICY.md) |
+| P0-47 | Prima abilitazione ZChainRead supera i test ZCR-01…ZCR-12 | Evidenza CI, test endpoint/TLS, quota, replay, schema e audit failure |
 
 ## 7. Gate P1 — Distribuzione e compatibilità
 

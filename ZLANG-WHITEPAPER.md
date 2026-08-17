@@ -85,6 +85,8 @@ Nel core ZREG v1 non sono presenti syscall host. Logging, processi, registry, ev
 
 L’interfaccia syscall futura sarà trattata come un ABI pubblico. Ogni syscall richiederà identificatore stabile, schema argomenti, risultato tipizzato, codici d’errore, capability dedicata, limiti di risorsa, audit e comportamento deterministico in caso di timeout o risorsa indisponibile.
 
+Il primo profilo proposto è [`ZChainRead`](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/ZCHAINREAD-SECURITY-POLICY.md): una capability read-only deny-by-default. Il modulo potrà richiedere esclusivamente query catalogate verso chain, endpoint, target e parametri autorizzati; l’adapter ZDOS gestirà trasporto, TLS, validazione risposta e audit append-only. Questo profilo è documentato ma non è presente nel bytecode o nella VM ZREG v1.
+
 ## 4. Il modello di sicurezza
 
 La sicurezza di ZLang non può essere affidata soltanto alla correttezza del codice dello script. Deve essere una proprietà dell’intera catena: sorgente, compilatore, bytecode, VM, runtime, syscall, configurazione e infrastruttura di distribuzione.

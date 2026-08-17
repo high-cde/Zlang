@@ -9,6 +9,7 @@ Questa directory raccoglie le specifiche e le guide operative di ZLang. Il Core 
 | [Specifica del bytecode](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/bytecode-spec.md) | Formato degli artefatti e modello di esecuzione della VM |
 | [Syscall ZDOS](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/syscalls.md) | Confine previsto tra runtime ZLang e capacità del sistema operativo |
 | [Checklist release stabile](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/STABLE-RELEASE-CHECKLIST.md) | Gate P0/P1, milestone, release candidate e decisione go/no-go per `v1.0.0` |
+| [Policy ZChainRead](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/ZCHAINREAD-SECURITY-POLICY.md) | Proposta deny-by-default per query Z-Chain future e audit append-only |
 | [Architettura](./wiki/Architecture.md) | Principi organizzativi del repository |
 | [Operazioni](./wiki/Operations.md) | Guida operativa e manutenzione |
 | [Roadmap](./wiki/Roadmap.md) | Priorità di sviluppo e percorso di consolidamento |
