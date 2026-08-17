@@ -30,10 +30,12 @@ printf '[ZLANG] Backup creato.\n'
 if command -v cargo >/dev/null 2>&1; then
   cargo fmt --all -- --check
   cargo check --all-targets
+  cargo clippy --all-targets --all-features -- -D warnings
   cargo test --all-targets
-  BUILD_STATUS='cargo fmt/check/test completati con successo.'
+  cargo build --release
+  BUILD_STATUS='cargo fmt/check/clippy/test/build release completati con successo.'
 else
-  BUILD_STATUS='cargo non disponibile nell’ambiente: build e test Rust non eseguiti.'
+  BUILD_STATUS='cargo non disponibile nell’ambiente: verifiche Rust e build release non eseguite.'
   printf '[ZLANG][WARN] %s\n' "$BUILD_STATUS"
 fi
 

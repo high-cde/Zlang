@@ -39,7 +39,7 @@ Questo principio porta a quattro obiettivi:
 
 ## 2. Che cos’è ZLang
 
-ZLang è progettato come linguaggio nativo per ZDOS, con estensione prevista `.zlang`. Il suo campo d’azione comprende scripting di sistema, demoni, orchestrazione di tool, nodi o client blockchain e automazione di servizi. [1]
+ZLang è progettato come linguaggio nativo per ZDOS. Il Core v1 usa l’estensione `.zl`; l’eventuale estensione `.zlang` resta una scelta futura di compatibilità. Il suo campo d’azione progettuale comprende scripting di sistema, demoni, orchestrazione di tool, nodi o client blockchain e automazione di servizi. [1]
 
 La scelta di un linguaggio dedicato non mira a sostituire Rust, C, Python o la shell in ogni scenario. Mira invece a creare una superficie intermedia: più strutturata e governabile di una shell, più leggera di un framework generale, più integrata con ZDOS di un runtime esterno.
 
@@ -51,44 +51,39 @@ L’architettura proposta separa la definizione del programma dall’ambiente ch
 
 ```mermaid
 flowchart LR
-    A[Script .zlang] --> B[Lexer]
-    B --> C[Parser e AST]
-    C --> D[Type Checker]
-    D --> E[Code Generator]
-    E --> F[Bytecode ZBC0]
-    F --> G[ZLang VM]
-    G --> H[Runtime]
-    H --> I[Syscall ZDOS]
-    I --> J[Kernel / Servizi / Registry]
-    G --> K[Audit Log]
-    G --> L[Policy Engine]
-    M[ZPM] --> C
-    M --> F
+    A[Sorgente .zl] --> B[Compiler Core v1]
+    B --> C[Modulo bytecode ZREG v1]
+    C --> D[Checksum e validazione]
+    D --> E[VM a registri]
+    E --> F[Capability policy]
+    F --> G[Output ConsoleWrite]
+    E --> H[Audit trail]
+    I[Estensioni future: syscall e ZPM] -. ABI versionato .-> E
 ```
 
 ### 3.1 Front-end linguistico
 
-Il front-end comprende lexer, parser, AST e controllo dei tipi. La specifica documenta variabili, funzioni, moduli, import, cicli, eccezioni, literal composti e operatori aritmetici e logici. [2]
+Il front-end implementato comprende tokenizzazione, parsing e compilazione del Core v1: interi `i64`, binding `let`, `print`, aritmetica, negazione e parentesi. Funzioni, moduli, import, cicli, eccezioni e literal composti restano estensioni progettuali, non feature disponibili. [2]
 
 Questa stratificazione è importante perché consente di controllare un programma prima dell’esecuzione. Un errore di sintassi deve essere individuato dal parser; un errore di tipo dal type checker; un permesso insufficiente dal runtime o dal policy engine. Separare questi livelli riduce la quantità di comportamento implicito.
 
 ### 3.2 Bytecode
 
-Il bytecode rappresenta il contratto tra compilatore e macchina virtuale. La specifica prevede un formato con header versionato, tabelle di costanti e simboli e una sezione di istruzioni composta da opcode e operandi. [3]
+Il bytecode implementato è `ZREG` v1: header con magic, versione, registri dichiarati, capability, sezione codice e checksum SHA-256. Il runtime rifiuta moduli corrotti, versione incompatibile, registri non validi, capability sconosciute o `HALT` non terminale prima dell’esecuzione. [3]
 
-Un formato versionato permette di aggiornare il compilatore senza perdere la compatibilità con artefatti precedenti. Permette inoltre di firmare, archiviare, distribuire e verificare un programma senza dover ridistribuire il sorgente originale.
+Un formato versionato permette di archiviare, distribuire e verificare un programma senza dover ridistribuire il sorgente originale. La compatibilità è esplicita: ZREG v1 esegue soltanto moduli della versione `1`.
 
 ### 3.3 Macchina virtuale
 
-La VM prevista è basata su stack e comprende concettualmente instruction pointer, stack pointer e frame pointer. Le categorie di istruzioni includono stack, variabili, operazioni aritmetiche e logiche, controllo di flusso, strutture dati e syscall. [3]
+La VM implementata è una macchina deterministica a registri con file fisso di 16 registri `i64`. Le istruzioni v1 includono caricamento immediato, copia, aritmetica controllata, negazione, output autorizzato e arresto. Overflow e divisione per zero interrompono l’esecuzione con errori strutturati, senza panic. [3]
 
-La VM è il punto in cui la portabilità incontra la sicurezza. Il bytecode non dovrebbe avere accesso diretto e illimitato all’ambiente ospite. Ogni capacità esterna deve passare da primitive riconoscibili, contabilizzabili e sottoponibili a policy.
+La VM è il punto in cui la portabilità incontra la sicurezza. Il bytecode v1 non ha accesso diretto a memoria host, shell, rete o filesystem. L’unica capability implementata è `ConsoleWrite`, dichiarata dal modulo e verificata dalla policy prima dell’istruzione `EMIT`.
 
 ### 3.4 Runtime e syscall
 
-Il runtime fornisce le astrazioni di alto livello; le syscall rappresentano il confine controllato verso ZDOS. La documentazione cita logging, esecuzione di processi, registry, eventi, tempo e networking. [4]
+Nel core ZREG v1 non sono presenti syscall host. Logging, processi, registry, eventi, tempo e networking sono riservati a un ABI futuro, capability-based e deny-by-default. [4]
 
-L’interfaccia syscall dovrebbe essere trattata come un ABI pubblico. Ogni syscall necessita di identificatore stabile, schema degli argomenti, risultato tipizzato, codici d’errore, requisiti di permesso e comportamento deterministico in caso di timeout o risorsa indisponibile.
+L’interfaccia syscall futura sarà trattata come un ABI pubblico. Ogni syscall richiederà identificatore stabile, schema argomenti, risultato tipizzato, codici d’errore, capability dedicata, limiti di risorsa, audit e comportamento deterministico in caso di timeout o risorsa indisponibile.
 
 ## 4. Il modello di sicurezza
 
@@ -163,15 +158,15 @@ La whitepaper deve distinguere chiaramente la visione dall’attuale repository.
 | Componente | Valutazione |
 |---|---|
 | Visione del linguaggio | Definita e documentata |
-| Specifica sintattica | Ampia, con grammatica EBNF |
-| Organizzazione del repository | Presente, ma con percorsi sorgente sovrapposti |
-| Percorso attivo del binario | Prototipale |
-| VM documentata | Più ambiziosa della VM dimostrativa attuale |
-| Syscall | Definite a livello concettuale, da stabilizzare come ABI |
-| ZPM | Presente come direzione progettuale iniziale |
-| Test e CI | Da consolidare |
+| Core sintattico | Implementato e delimitato: interi, `let`, `print`, aritmetica |
+| Organizzazione del repository | Percorso canonico sotto `src/` |
+| Percorso attivo del binario | Compiler → ZREG v1 → VM a registri |
+| Bytecode e VM | Header, checksum, opcode, limiti e audit implementati |
+| Capability | `ConsoleWrite` implementata con policy deny-by-default disponibile |
+| Syscall host e ZPM | Direzioni progettuali, non implementate |
+| Test e CI | Test end-to-end e workflow Rust presenti |
 
-Nel percorso principale osservato, il compilatore riconosce un insieme ristretto di comandi dimostrativi come `emit`, `orbit_sync` e `zchain`. La VM interpreta istruzioni stringa e produce output o invoca primitive simulate. Questo dimostra il flusso minimo di esecuzione, ma non equivale ancora alla pipeline completa descritta dalla specifica.
+Il percorso principale non interpreta più stringhe dimostrative. Il compilatore produce un modulo binario ZREG verificabile; la VM convalida l’artefatto, applica policy e limiti, quindi produce audit per ciascuna istruzione. Le estensioni oltre il Core v1 restano esplicitamente fuori dal runtime finché non verranno implementate e testate.
 
 Questa differenza non indebolisce la tesi del progetto; definisce piuttosto il lavoro necessario per trasformare un prototipo in una piattaforma. La roadmap deve essere misurata su funzionalità compilabili, testate e osservabili, non soltanto su sezioni documentali.
 
@@ -179,15 +174,15 @@ Questa differenza non indebolisce la tesi del progetto; definisce piuttosto il l
 
 ### Fase I — Fondazione verificabile
 
-La prima fase deve unificare l’architettura sorgente e rendere riproducibile la build. Il progetto dovrebbe avere un solo percorso canonico per lexer, parser, AST, type checker, code generator e VM. Gli esempi dovrebbero essere eseguiti automaticamente in CI.
+**Stato: realizzata per il Core v1.** Il repository usa un percorso canonico sotto `src/`, la build Rust è riproducibile e la CI esegue formattazione, check, test e Clippy. Il core dispone di test end-to-end per sorgente, bytecode, capability, audit e CLI.
 
 ### Fase II — MVP linguistico
 
-Il minimo prodotto funzionante dovrebbe includere numeri, stringhe, variabili, funzioni, condizioni, cicli, error handling e un modello di moduli. Ogni costrutto deve avere test di parsing, compilazione ed esecuzione.
+**Stato: in corso.** Numeri, binding `let`, aritmetica, error handling e output autorizzato sono implementati. Stringhe, funzioni, condizioni, cicli e moduli saranno aggiunti solo con semantica, bytecode, limiti e test completi.
 
 ### Fase III — Bytecode e VM stabili
 
-Questa fase introduce header, opcode, serializzazione, versionamento, errori runtime, limiti di risorse e compatibilità tra versioni. La VM deve diventare un componente testabile indipendentemente dal front-end.
+**Stato: fondazione realizzata.** ZREG v1 dispone di header, checksum SHA-256, opcode a registri, serializzazione, validazione, limiti e test indipendenti dal front-end. Le prossime versioni dovranno introdurre nuove semantiche soltanto attraverso versionamento esplicito.
 
 ### Fase IV — Capability security
 
@@ -225,9 +220,9 @@ La sua opportunità nasce dall’intersezione di cinque esigenze: portabilità, 
 
 ## Conclusione
 
-La visione di ZLang è quella di un linguaggio che tratta l’esecuzione come un atto infrastrutturale: identificato, autorizzato, osservabile e riproducibile. È una direzione ambiziosa, ma il repository possiede già gli elementi concettuali da cui partire: una specifica del linguaggio, una struttura per compilatore e VM, un runtime, syscall documentate, esempi e un package manager in evoluzione.
+La visione di ZLang è quella di un linguaggio che tratta l’esecuzione come un atto infrastrutturale: identificato, autorizzato, osservabile e riproducibile. Il repository ora possiede una filiera concreta da cui partire: specifica Core v1, compilatore, bytecode ZREG verificato, VM a registri, policy di capability, audit, CLI e test end-to-end.
 
-Il lavoro decisivo è ora trasformare la superficie progettuale in un sistema coerente. Unificare il codice, stabilizzare il bytecode, testare la VM, definire l’ABI, applicare capability security e rendere ZPM verificabile sono i passaggi che separano il manifesto dalla piattaforma.
+Il lavoro decisivo è estendere questa base senza reintrodurre comportamento implicito. Funzioni, memoria guest, ABI syscall, capability host, sandbox OS, networking e ZPM dovranno essere implementati come contratti versionati, testati e documentati. Questo è il passaggio che separa il manifesto da una piattaforma operativa.
 
 La promessa più forte di ZLang non è la quantità di funzionalità. È la possibilità di costruire un linguaggio in cui **il confine tra intenzione operativa e potere di sistema sia finalmente esplicito**.
 
@@ -235,8 +230,8 @@ La promessa più forte di ZLang non è la quantità di funzionalità. È la poss
 
 ## Riferimenti
 
-[1]: https://github.com/high-cde/Zlang/blob/main/README.md "ZLang README e visione del progetto"
-[2]: https://github.com/high-cde/Zlang/blob/main/docs/language-spec.md "ZLang language specification"
-[3]: https://github.com/high-cde/Zlang/blob/main/docs/bytecode-spec.md "ZLang bytecode specification"
-[4]: https://github.com/high-cde/Zlang/blob/main/docs/syscalls.md "ZLang syscall documentation"
-[5]: https://github.com/high-cde/Zlang/blob/main/Cargo.toml "ZLang Cargo manifest"
+[1]: https://raw.githubusercontent.com/high-cde/Zlang/main/README.md "ZLang README e visione del progetto"
+[2]: https://raw.githubusercontent.com/high-cde/Zlang/main/docs/language-spec.md "ZLang language specification"
+[3]: https://raw.githubusercontent.com/high-cde/Zlang/main/docs/bytecode-spec.md "ZLang bytecode specification"
+[4]: https://raw.githubusercontent.com/high-cde/Zlang/main/docs/syscalls.md "ZLang syscall documentation"
+[5]: https://raw.githubusercontent.com/high-cde/Zlang/main/Cargo.toml "ZLang Cargo manifest"

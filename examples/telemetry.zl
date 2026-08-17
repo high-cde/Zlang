@@ -1,0 +1,6 @@
+# Esempio ZLang Core v1: calcolo telemetrico deterministico.
+let altitude_km = 408
+let samples = 6
+let average = altitude_km / samples
+let corrected = average + 4
+print corrected

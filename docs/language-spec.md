@@ -1,180 +1,89 @@
-# Specifica del Linguaggio ZLang
+# Specifica del linguaggio ZLang — Core v1
 
-## 1. Identità del linguaggio
+**Stato:** implementato nel compilatore e nella VM a registri di ZLang `v2026.2.0`.
 
-- **Nome linguaggio**: ZLang
-- **Estensione file**: `.zlang`
-- **Ruolo**:
-  - Linguaggio di sistema nativo ZDOS
-  - Scripting, daemon, orchestrazione tool, client/nodi blockchain
-- **Target**:
-  - Interprete + VM a bytecode
-  - Portabile su Linux/Termux, x86 vecchi, ARM
+Questa specifica descrive il **core realmente eseguibile**. Moduli, stringhe, liste, mappe, funzioni, eccezioni, rete, registry, filesystem, ZPM e syscall di sistema appartengono alla roadmap progettuale e non fanno parte del contratto stabile del core v1.
 
-## 2. Specifica del linguaggio
+## 1. Obiettivo del core
 
-### 2.1. Tipi e valori
+ZLang Core v1 è un linguaggio minimale e deterministico per espressioni intere. Compila sorgente `.zl` in bytecode `ZREG` e lo esegue attraverso una VM con registri limitati, checksum, policy di capability e audit trail.
 
-- **Tipi primitivi**:
-  - `int` (64 bit)
-  - `float` (64 bit)
-  - `bool` (true / false)
-  - `str` (UTF-8)
-  - `bytes`
-  - `list` (eterogenea)
-  - `map` (chiave `str` → valore generico)
-  - `func`
-- **Literals**:
+| Caratteristica | Stato v1 |
+|---|---|
+| Interi `i64` | Implementata |
+| Variabili `let` | Implementata |
+| Operatori `+ - * /` | Implementati |
+| Negazione unaria | Implementata |
+| Precedenza e parentesi | Implementate |
+| `print` | Implementato; richiede `ConsoleWrite` |
+| Commenti `#` | Implementati |
+| Moduli/funzioni/cicli | Non implementati |
+| Stringhe/collezioni | Non implementate |
+| Syscall host/rete/filesystem | Non implementate |
+
+## 2. Esempio eseguibile
 
 ```zlang
-let a = 42
-let pi = 3.14
-let ok = true
-let name = "High"
-let data = 0xDEADBEEF
-let arr = [1, 2, 3]
-let cfg = { "id": "node-1", "port": 8080 }
+# Telemetria numerica deterministica.
+let altitude = 408
+let correction = altitude / 6
+let result = correction + 4
+print result
 ```
 
-### 2.2. Variabili e assegnazione
+Compilazione ed esecuzione:
 
-- **Dichiarazione**:
-
-```zlang
-let x = 10
-let msg: str = "hello"
+```bash
+zlang compile telemetry.zl telemetry.zreg
+zlang exec telemetry.zreg --audit
 ```
 
-- **Riassegnazione**:
+## 3. Lessico
 
-```zlang
-x = x + 1
-```
+Gli identificatori iniziano con una lettera ASCII o `_` e possono contenere lettere, cifre e `_`. I letterali numerici sono interi decimali firmati tramite negazione unaria. Gli spazi sono ignorati; newline e `;` separano le istruzioni. Un commento inizia con `#` e prosegue fino alla fine della riga.
 
-### 2.3. Funzioni
+| Token | Significato |
+|---|---|
+| `let` | Introduce un binding immutabile nel core v1 |
+| `print` | Emette il valore di un’espressione sull’output autorizzato |
+| `+ - * /` | Operatori aritmetici |
+| `=` | Assegnazione nell’istruzione `let` |
+| `(` `)` | Raggruppamento delle espressioni |
+| `#` | Inizio commento |
 
-- **Definizione**:
-
-```zlang
-func add(a: int, b: int) -> int {
-    return a + b
-}
-
-func log_system(msg: str) {
-    sys.log("core", msg)
-}
-```
-
-- **Funzioni anonime**:
-
-```zlang
-let f = func(x: int) -> int {
-    return x * 2
-}
-```
-
-### 2.4. Controllo di flusso
-
-```zlang
-if x > 5 {
-    sys.log("test", "x > 5")
-} else {
-    sys.log("test", "x <= 5")
-}
-
-for i in 0..10 {
-    sys.log("loop", "i=" + str(i))
-}
-
-while x < 100 {
-    x = x + 10
-}
-```
-
-### 2.5. Moduli
-
-- **Dichiarazione modulo**:
-
-```zlang
-module chain.node
-```
-
-- **Import**:
-
-```zlang
-import sys
-import net
-import chain.util
-```
-
-### 2.6. Errori ed eccezioni
-
-```zlang
-func risky() {
-    if something_wrong {
-        throw "bad state"
-    }
-}
-
-func main() {
-    try {
-        risky()
-    } catch err {
-        sys.log("err", "caught: " + err)
-    }
-}
-```
-
-## 3. Grammatica (EBNF minimale)
+## 4. Grammatica EBNF
 
 ```ebnf
-Program      = { Statement } ;
-
-Statement    = VarDecl | Assign | FuncDecl | IfStmt | ForStmt | WhileStmt
-             | ImportStmt | ModuleStmt | ExprStmt | ThrowStmt | TryCatch ;
-
-VarDecl      = "let" Identifier [ ":" Type ] "=" Expression ;
-Assign       = Identifier "=" Expression ;
-FuncDecl     = "func" Identifier "(" [ ParamList ] ")" [ "->" Type ] Block ;
-ParamList    = Param { "," Param } ;
-Param        = Identifier ":" Type ;
-
-IfStmt       = "if" Expression Block [ "else" Block ] ;
-ForStmt      = "for" Identifier "in" Expression ".." Expression Block ;
-WhileStmt    = "while" Expression Block ;
-
-ImportStmt   = "import" Identifier { "." Identifier } ;
-ModuleStmt   = "module" Identifier { "." Identifier } ;
-
-ThrowStmt    = "throw" Expression ;
-TryCatch     = "try" Block "catch" Identifier Block ;
-
-Block        = "{" { Statement } "}" ;
-
-ExprStmt     = Expression ;
-
-Expression   = LogicOr ;
-LogicOr      = LogicAnd { "||" LogicAnd } ;
-LogicAnd     = Equality { "&&" Equality } ;\nEquality     = Relational { ("==" | "!=") Relational } ;
-Relational   = Additive { ("<" | ">" | "<=" | ">=") Additive } ;
-Additive     = Multiplicative { ("+" | "-") Multiplicative } ;
-Multiplicative = Unary { ("*" | "/" | "%") Unary } ;
-Unary        = [ "!" | "-" ] Primary ;
-Primary      = Literal
-             | Identifier
-             | "(" Expression ")"
-             | Primary "." Identifier
-             | Primary "(" [ ArgList ] ")" ;
-
-ArgList      = Expression { "," Expression } ;
-
-Literal      = IntLiteral | FloatLiteral | StringLiteral
-             | BoolLiteral | ListLiteral | MapLiteral ;
-
-ListLiteral  = "[" [ Expression { "," Expression } ] "]" ;
-MapLiteral   = "{" [ StringLiteral ":" Expression { "," StringLiteral ":" Expression } ] "}" ;
-
-Type         = "int" | "float" | "bool" | "str" | "bytes" | "list" | "map" | "func" ;
-
-Identifier   = Letter { Letter | Digit | "_" } ;
+program        = { newline } , { statement , { newline } } , EOF ;
+statement      = let_statement | print_statement ;
+let_statement  = "let" , identifier , "=" , expression ;
+print_statement= "print" , expression ;
+expression     = term , { ("+" | "-") , term } ;
+term           = factor , { ("*" | "/") , factor } ;
+factor         = integer | identifier | "-" , factor | "(" , expression , ")" ;
+identifier     = ( letter | "_" ) , { letter | digit | "_" } ;
+integer        = digit , { digit } ;
+newline        = "\n" | ";" ;
 ```
+
+## 5. Semantica
+
+Le espressioni usano aritmetica intera signed a 64 bit. `*` e `/` hanno precedenza su `+` e `-`; operatori con la stessa precedenza sono valutati da sinistra a destra. Le variabili sono risolte dal compilatore e mappate su registri della VM; un identificatore non definito produce un errore di compilazione.
+
+Il core v1 dispone di un massimo di 16 registri fisici per modulo. Un programma o un’espressione che richieda più registri viene rifiutato in compilazione con un errore esplicito; non viene eseguito alcun spilling implicito su memoria host.
+
+Overflow aritmetico e divisione per zero generano un errore runtime controllato. Non causano panic del processo Rust e vengono registrati nell’audit della VM.
+
+## 6. Errori
+
+| Categoria | Esempio | Codice CLI |
+|---|---|---:|
+| Sorgente | Carattere non supportato, parentesi mancante | `65` |
+| Compilazione | Variabile non definita, budget registri superato | `65` |
+| I/O | File sorgente o modulo non leggibile | `66` |
+| Runtime | Divisione per zero, overflow, capability negata | `70` |
+| Utilizzo | Comando CLI non valido | `64` |
+
+## 7. Estensioni non implementate
+
+Le seguenti aree restano intenzioni di progetto e non devono essere invocate dal core v1: funzioni, moduli, import, tipi compositi, eccezioni, byte/string literal, controllo di flusso, processo, filesystem, rete, registry, telemetria orbitale, Z-Chain e package management. Ogni estensione richiederà una proposta di linguaggio, semantica bytecode, capability, limiti di risorsa, test e aggiornamento di versione prima di essere promossa nel core stabile.

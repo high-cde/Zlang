@@ -1,288 +1,133 @@
-<div align="center">
-
 # ZLang
 
-### The Sovereign Execution Layer for ZDOS
+### Deterministic Register-VM Core for ZDOS
 
-**Un linguaggio nativo per sistemi operativi, automazione governata e infrastrutture distribuite.**
+**ZLang è un core di esecuzione Rust per ZDOS: sorgente `.zl`, compilatore, bytecode `ZREG`, macchina virtuale a registri, capability esplicite e audit deterministico.**
 
 [![Repository](https://img.shields.io/badge/GitHub-high--cde%2FZlang-181717?logo=github)](https://github.com/high-cde/Zlang)
 [![Rust](https://img.shields.io/badge/implementation-Rust-dea584?logo=rust&logoColor=white)](https://www.rust-lang.org/)
-[![Status](https://img.shields.io/badge/status-prototype%20%7C%20active%20development-7c3aed)](https://github.com/high-cde/Zlang)
+[![Status](https://img.shields.io/badge/runtime-ZREG%20v1%20implemented-0b7285)](https://github.com/high-cde/Zlang)
 [![Release](https://img.shields.io/badge/release-v2026.2.0-0b7285)](https://github.com/high-cde/Zlang/releases/tag/v2026.2.0)
-[![Stars](https://img.shields.io/github/stars/high-cde/Zlang?style=flat&logo=github)](https://github.com/high-cde/Zlang/stargazers)
-[![Issues](https://img.shields.io/github/issues/high-cde/Zlang?style=flat&logo=github)](https://github.com/high-cde/Zlang/issues)
 [![Whitepaper](https://img.shields.io/badge/read-Whitepaper-111827?logo=readthedocs&logoColor=white)](https://raw.githubusercontent.com/high-cde/Zlang/main/ZLANG-WHITEPAPER.md)
 
-</div>
+> **Il core v1 non esegue codice nativo, shell, rete o syscall host. Ogni programma passa attraverso bytecode verificato, registri limitati, policy di capability e audit runtime.**
 
-> **ZLang non è soltanto un linguaggio. È un confine governato tra intenzione operativa e potere di sistema.**
+## Cosa funziona oggi
 
-## Visione
-
-I sistemi operativi moderni sono composti da shell, demoni, API, agenti, runtime e orchestratori. ZLang nasce per riunire questi livelli in un execution layer compatto, portabile e verificabile per l’ecosistema **ZDOS**.
-
-La sua tesi è semplice: **un sistema operativo sovrano ha bisogno di un linguaggio sovrano**. Un linguaggio capace di descrivere servizi, automazioni e operazioni privilegiate senza rinunciare a controllo, audit, policy e riproducibilità.
-
-ZLang è progettato per scripting di sistema, demoni, orchestrazione di tool, runtime edge, networking e client o nodi blockchain. La visione tecnica comprende compilatore, bytecode, macchina virtuale, runtime, syscall ZDOS e package manager ZPM.
-
-## Perché ZLang
-
-| Problema | Risposta ZLang |
+| Livello | Implementazione corrente |
 |---|---|
-| Script difficili da governare | Programmi strutturati, tipizzabili e sottoponibili a policy |
-| Runtime eterogenei | Bytecode e VM come contratto di portabilità |
-| Capacità di sistema implicite | Syscall esplicite, capability e confini di autorizzazione |
-| Demoni distribuiti senza uniformità | Runtime comune per servizi, agenti e automazioni |
-| Dipendenze non verificabili | ZPM, manifest, versionamento e artefatti firmabili |
-| Integrazioni remote rischiose | Whitelist, ruoli, audit e divieto di codice arbitrario |
+| Linguaggio | Interi `i64`, `let`, `print`, `+ - * /`, negazione, parentesi e commenti |
+| Compilatore | Lexer/parser integrato con errori strutturati e budget di 16 registri |
+| Bytecode | Formato binario `ZREG` v1 con magic, versione, capability, codice e SHA-256 |
+| VM | Macchina deterministica con 16 registri, aritmetica controllata e limiti di esecuzione |
+| Capability | `ConsoleWrite` dichiarata dal modulo e autorizzata dalla policy runtime |
+| Audit | Evento per istruzione: successo, diniego o fallimento |
+| CLI | `run`, `compile`, `exec` e `inspect` |
+| Qualità | Test end-to-end, formattazione, check e Clippy in CI |
 
-## Architettura
+Il core è progettato come fondazione verificabile. Funzioni, moduli, stringhe, collection, rete, filesystem, processi, registry, Z-Chain e ZPM **non sono implementati nel runtime v1** e restano soggetti a proposte, capability, limiti, test e versionamento espliciti.
+
+## Filiera di esecuzione
 
 ```mermaid
 flowchart LR
-    A[Script .zlang] --> B[Lexer]
-    B --> C[Parser / AST]
-    C --> D[Type Checker]
-    D --> E[Code Generator]
-    E --> F[Bytecode ZBC0]
-    F --> G[ZLang VM]
-    G --> H[Runtime]
-    H --> I[Syscall ZDOS]
-    I --> J[Kernel / Registry / Services]
-    G --> K[Audit Log]
-    G --> L[Policy Engine]
-    M[ZPM] --> C
-    M --> F
+    A[Sorgente .zl] --> B[Compiler Core v1]
+    B --> C[Modulo ZREG v1]
+    C --> D[Checksum e validazione]
+    D --> E[VM a registri]
+    E --> F[Capability policy]
+    F --> G[Output autorizzato]
+    E --> H[Audit trail]
 ```
 
-### Componenti principali
-
-| Componente | Funzione |
-|---|---|
-| `src/compiler/` | Compilatore attivo e generazione delle istruzioni runtime supportate |
-| `src/lexer.rs` e `src/parser.rs` | Tokenizzazione e parser del sottoinsieme aritmetico di riferimento |
-| `src/vm/` | Macchina virtuale del percorso esecutivo attivo |
-| `src/zpm/` | Primitive dimostrative per il package/runtime layer |
-| `tests/` | Test di integrazione per linguaggio, compilatore e CLI |
-| `examples/` | Esempio di nodo chain concettuale |
-| `docs/` | Indice, specifiche tecniche e wiki operativa |
-
-## Linguaggio
-
-La specifica di ZLang prevede una sintassi compatta con variabili, funzioni, moduli, import, controllo di flusso, gestione degli errori e strutture dati.
-
-```zlang
-module chain.node
-
-import sys
-import net
-
-func main() {
-    sys.log("chain.node", "boot")
-
-    let cfg = sys.registry.get("chain.node")
-    sys.log("chain.node", "node online")
-
-    while true {
-        tick(cfg)
-        sys.sleep(1000)
-    }
-}
-```
-
-I tipi documentati includono `int`, `float`, `bool`, `str`, `bytes`, `list`, `map` e `func`. Gli operatori previsti coprono aritmetica, confronti, logica, chiamate e accesso a strutture dati. [1]
-
-## Esecuzione
-
-Il flusso concettuale è:
-
-```text
-.zlang source
-     ↓
-lexer → parser → AST → type checker
-     ↓
-bytecode ZBC0
-     ↓
-ZLang VM
-     ↓
-runtime + syscall ZDOS
-```
-
-La documentazione prevede una CLI con comandi per eseguire script, compilare bytecode ed eseguire artefatti compilati:
-
-```bash
-# Build del progetto Rust
-cargo build --release
-
-# Esecuzione di uno script supportato dal runtime attivo
-./target/release/zlang test.zl
-
-# Esempio con sorgente temporaneo
-printf 'emit hello\norbit_sync\n' > /tmp/hello.zl
-./target/release/zlang /tmp/hello.zl
-```
-
-> **Nota sullo stato:** il repository è in sviluppo attivo. La specifica descrive una superficie linguistica più ampia del percorso esecutivo prototipale attualmente collegato al binario principale. Per una valutazione precisa, consultare la [whitepaper tecnica](https://raw.githubusercontent.com/high-cde/Zlang/main/ZLANG-WHITEPAPER.md) e la documentazione in `docs/`.
-
-## Sicurezza come architettura
-
-ZLang tratta le capacità di sistema come privilegi espliciti, non come effetti collaterali invisibili.
-
-| Superficie | Controllo previsto |
-|---|---|
-| Filesystem | Scope di lettura/scrittura e directory autorizzate |
-| Networking | Endpoint, protocolli e timeout dichiarati |
-| Processi | Comandi consentiti e limiti di esecuzione |
-| Registry | Chiavi e operazioni autorizzate |
-| Risorse | Memoria, tempo, file descriptor e retry |
-| Esecuzione remota | Script registrati, whitelist e ruoli |
-| Audit | Identità dello script, versione, syscall ed esito |
-
-Per le integrazioni remote, il progetto adotta un principio essenziale: **mai eseguire codice arbitrario ricevuto direttamente da un canale esterno**. Un bot, un webhook o un daemon devono riferirsi a script registrati, versionati e autorizzati.
-
-## ZPM: il package manager come registro d’identità
-
-ZPM è progettato per gestire manifest, dipendenze e build di progetti ZLang.
-
-```toml
-[package]
-name = "chain-node"
-version = "0.1.0"
-entry = "src/main.zlang"
-
-[deps]
-net = "core"
-sys = "core"
-```
-
-In una release matura, ZPM dovrebbe estendere questo modello con capability richieste, compatibilità del runtime, hash degli artefatti, firme dei maintainer e build riproducibili.
-
-## Casi d’uso
-
-### Demoni ZDOS
-
-Servizi persistenti capaci di leggere configurazioni, emettere log, interagire con il registry e mantenere cicli operativi controllati.
-
-### Orchestrazione di sistema
-
-Workflow riproducibili per verificare prerequisiti, avviare processi, gestire errori, applicare retry e produrre audit log.
-
-### Edge e dispositivi eterogenei
-
-Un runtime compatto e un bytecode versionato possono offrire una superficie comune tra Linux, Termux, ARM e sistemi x86 legacy, nei limiti delle syscall disponibili.
-
-### Infrastrutture distribuite
-
-Client, agenti e nodi che coordinano networking, configurazione, eventi, telemetria e interazioni con servizi distribuiti.
-
-## SpaceX, Starlink e il contesto orbitale
-
-ZLang include riferimenti concettuali a networking, nodi distribuiti e scenari orbitali. Questi riferimenti appartengono alla **visione applicativa e all’ispirazione tecnica** del progetto; non costituiscono una partnership, integrazione ufficiale o affiliazione con SpaceX o Starlink.
-
-Per contesto esterno:
-
-- [SpaceX](https://www.spacex.com/) descrive pubblicamente la propria attività nello sviluppo e lancio di razzi e veicoli spaziali.
-- [Starlink Technology](https://www.starlink.com/technology) presenta la propria rete come una costellazione satellitare in orbita bassa orientata alla connettività a banda larga.
-- Gli [aggiornamenti ufficiali di SpaceX](https://www.spacex.com/updates) forniscono il contesto pubblico sulle attività di lancio e sulle missioni dell’azienda.
-
-ZLang può essere discusso in relazione a questi scenari come **execution layer concettuale per sistemi distribuiti, edge e connettività resiliente**. Non deve essere presentato come tecnologia SpaceX/Starlink né come prodotto approvato, sponsorizzato o utilizzato da tali organizzazioni.
-
-## Stato del progetto
-
-| Area | Stato |
-|---|---|
-| Visione e posizionamento | Definiti |
-| Specifica linguistica | Documentata e in evoluzione |
-| Struttura compilatore/VM | Presente nel repository |
-| Percorso esecutivo attivo | Prototipale |
-| Bytecode binario completo | In consolidamento |
-| Syscall ZDOS | Specifica concettuale da stabilizzare come ABI |
-| ZPM | Direzione progettuale iniziale |
-| CI e test cross-platform | Da consolidare |
-
-ZLang è attualmente un **prototipo avanzato con specifica estesa**. La roadmap pubblica privilegia la trasparenza: ogni funzionalità deve passare dalla visione documentale a un’implementazione testata, osservabile e riproducibile.
-
-## Roadmap
-
-### Phase I — Verified Foundation
-
-Unificare il percorso sorgente, rendere riproducibile la build e aggiungere test automatici per lexer, parser, compilatore, VM ed esempi.
-
-### Phase II — Language MVP
-
-Consolidare numeri, stringhe, variabili, funzioni, condizioni, cicli, moduli ed error handling.
-
-### Phase III — Stable Bytecode
-
-Stabilizzare header, opcode, serializzazione, versionamento, compatibilità e limiti di risorsa.
-
-### Phase IV — Capability Security
-
-Collegare syscall e policy a capability verificabili, con audit, timeout e controlli per filesystem, rete, processi e registry.
-
-### Phase V — Ecosystem
-
-Rendere ZPM riproducibile, introdurre pacchetti firmati, librerie standard e aggiornamenti verificati.
-
-### Phase VI — Sovereign Distribution
-
-Portare il runtime su architetture eterogenee e scenari edge/distribuiti con profili di compatibilità documentati.
-
-## Repository map
-
-```text
-Zlang/
-├── src/                  # Unico percorso sorgente Rust attivo
-├── tests/                # Test di integrazione per lexer, parser, compilatore e CLI
-├── examples/             # Esempio di nodo chain concettuale
-├── docs/                 # Indice, specifiche tecniche e wiki operativa
-├── .github/workflows/    # Verifica continua di format, check, test e Clippy
-├── ZLANG-WHITEPAPER.md   # Whitepaper strategica e tecnica
-├── Cargo.toml            # Manifest del pacchetto Rust
-└── one-shot-zlang.sh     # Validazione locale con backup, senza push automatico
-```
+La VM non è un hypervisor e non sostituisce le protezioni del kernel, dei container o della VPS. Il suo ruolo è definire un confine applicativo riproducibile: nessun accesso host è presente nel core v1 e le istruzioni supportate sono validate prima dell’esecuzione.
 
 ## Quick start
 
 ```bash
 git clone https://github.com/high-cde/Zlang.git
 cd Zlang
-
-# Procedura locale sicura: backup, controlli e report.
-./one-shot-zlang.sh
-
-# Build quando Rust/Cargo è disponibile.
 cargo build --release
+
+cat > /tmp/telemetry.zl <<'EOF'
+# Programma Core v1 eseguibile.
+let altitude = 408
+let correction = altitude / 6
+let result = correction + 4
+print result
+EOF
+
+# Sorgente -> bytecode ZREG.
+./target/release/zlang compile /tmp/telemetry.zl /tmp/telemetry.zreg
+
+# Validazione bytecode, esecuzione e audit.
+./target/release/zlang exec /tmp/telemetry.zreg --audit
 ```
 
-La procedura `one-shot-zlang.sh` non cancella sorgenti, non esegue push remoto automatico e crea un backup datato prima dei controlli.
+L’output è `72`, seguito dagli eventi di audit. Per eseguire senza creare un file modulo intermedio:
+
+```bash
+./target/release/zlang run /tmp/telemetry.zl --audit
+```
+
+## CLI
+
+| Comando | Funzione |
+|---|---|
+| `zlang run <source.zl> [--audit]` | Compila in memoria ed esegue il sorgente |
+| `zlang compile <source.zl> <module.zreg>` | Produce un modulo bytecode ZREG con checksum |
+| `zlang exec <module.zreg> [--audit]` | Verifica e avvia un modulo ZREG |
+| `zlang inspect <module.zreg>` | Mostra versione, registri, capability e numero istruzioni |
+
+I codici di uscita sono definiti: `64` uso CLI non valido, `65` sorgente/compilazione, `66` I/O, `70` bytecode o runtime.
+
+## Sicurezza e determinismo
+
+| Controllo | Comportamento v1 |
+|---|---|
+| Validazione modulo | Magic `ZREG`, versione, checksum, capability, registri e `HALT` terminale |
+| File di registri | Massimo 16 registri `i64`; nessun puntatore o memoria host esposta |
+| Aritmetica | Overflow e divisione per zero sono errori controllati |
+| Budget runtime | Limite default di 100.000 istruzioni e 64 KiB output |
+| Capability | `EMIT` richiede `ConsoleWrite` nel modulo e nella policy |
+| Audit | Ogni istruzione registra `Allowed`, `Denied` o `Failed` |
+| Accesso host | Filesystem, processi e rete non esistono nel core v1 |
+
+## Stato e roadmap
+
+ZLang è un **prototipo avanzato con core runtime concreto**. Il contratto di `ZREG` v1 è implementato e testato; la prima release stabile richiede il completamento della [checklist di rilascio](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/STABLE-RELEASE-CHECKLIST.md), inclusi coverage, packaging verificabile, licenza, release candidate e hardening multi-piattaforma.
+
+Le prossime estensioni devono essere promosse nell’ordine seguente: controllo di flusso e funzioni; tipi e memoria guest; ABI syscall capability-based; sandbox OS/container; networking e filesystem; package management e distribuzione firmata. Nessuna estensione verrà considerata disponibile senza semantica, bytecode, policy, test e documentazione allineati.
+
+## Repository
+
+```text
+Zlang/
+├── src/
+│   ├── compiler/          # Front-end Core v1 -> istruzioni a registri
+│   ├── vm/                # ZREG, validazione, policy, VM e audit
+│   ├── error.rs           # Errori strutturati e codici CLI
+│   └── main.rs            # CLI run/compile/exec/inspect
+├── tests/                 # Test bytecode, VM, capability e CLI
+├── docs/                  # Specifiche, checklist e wiki
+├── .github/workflows/     # CI Rust
+├── ZLANG-WHITEPAPER.md    # Visione strategica e roadmap
+└── one-shot-zlang.sh      # Validazione locale con backup
+```
+
+## Documentazione
+
+- [Indice tecnico](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/README.md)
+- [Core language v1](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/language-spec.md)
+- [Bytecode ZREG v1](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/bytecode-spec.md)
+- [Checklist prima release stabile](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/STABLE-RELEASE-CHECKLIST.md)
+- [Security policy](https://raw.githubusercontent.com/high-cde/Zlang/main/SECURITY.md)
+- [Whitepaper](https://raw.githubusercontent.com/high-cde/Zlang/main/ZLANG-WHITEPAPER.md)
 
 ## Contribuire
 
-Il contributo più utile è trasformare la specifica in comportamento verificabile. Prima di proporre una modifica, descrivere il caso d’uso, il comportamento previsto, gli errori possibili, le implicazioni di sicurezza e il test associato.
+Ogni contributo al core deve includere semantica, errore previsto, impatto sulle capability, limiti di risorsa, test di regressione e aggiornamento della documentazione. Per nuove capacità host, il progetto richiede inoltre una review di sicurezza prima dell’abilitazione.
 
-Le contribuzioni dovrebbero mantenere separati il core della VM, il runtime, le syscall ZDOS e gli strumenti dell’ecosistema. Ogni nuova syscall dovrebbe avere una specifica, un identificatore stabile, un contratto degli argomenti, codici d’errore e almeno un test.
+## Marchi e riferimenti esterni
 
-## Licenza e marchi
-
-Verificare il file di licenza del repository prima di redistribuire il codice. **SpaceX**, **Starlink** e i relativi nomi e marchi appartengono ai rispettivi titolari. I riferimenti in questo README hanno esclusivamente funzione contestuale e informativa; non implicano endorsement, partnership o affiliazione.
-
-## Documentazione e riferimenti
-
-- [Indice della documentazione](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/README.md)
-- [Whitepaper ZLang](https://raw.githubusercontent.com/high-cde/Zlang/main/ZLANG-WHITEPAPER.md)
-- [Specifiche del linguaggio](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/language-spec.md)
-- [Specifiche del bytecode](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/bytecode-spec.md)
-- [Syscall ZDOS](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/syscalls.md)
-- [Script one-shot sicuro](https://raw.githubusercontent.com/high-cde/Zlang/main/one-shot-zlang.sh)
-- [SpaceX — sito ufficiale](https://www.spacex.com/)
-- [Starlink — tecnologia](https://www.starlink.com/technology)
-- [SpaceX — aggiornamenti](https://www.spacex.com/updates)
-
-## Riferimenti
-
-[1]: https://raw.githubusercontent.com/high-cde/Zlang/main/docs/language-spec.md "ZLang language specification"
-[2]: https://raw.githubusercontent.com/high-cde/Zlang/main/docs/bytecode-spec.md "ZLang bytecode specification"
-[3]: https://raw.githubusercontent.com/high-cde/Zlang/main/docs/syscalls.md "ZLang syscall documentation"
-[4]: https://raw.githubusercontent.com/high-cde/Zlang/main/ZLANG-WHITEPAPER.md "ZLang technical whitepaper"
+SpaceX e Starlink, ove menzionati nella whitepaper come esempi contestuali di sistemi distribuiti o orbitali, non sono partner, utenti, sponsor né affiliati di ZLang o ZDOS.

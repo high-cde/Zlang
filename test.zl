@@ -1,4 +1,5 @@
-emit Avvio inizializzazione ZDOS
-orbit_sync
-zchain 0xADF987...221
-emit Operazioni concluse con successo.
+# Smoke test del core ZLang v1.
+let baseline = 40
+let correction = 2
+let answer = baseline + correction
+print answer

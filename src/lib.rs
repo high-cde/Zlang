@@ -1,10 +1,10 @@
-pub mod cli;
 pub mod compiler;
-pub mod lexer;
-pub mod parser;
-pub mod runtime;
+pub mod error;
 pub mod vm;
-pub mod zpm;
 
-pub use compiler::{AstNode, Compiler};
-pub use vm::ZVirtualMachine;
+pub use compiler::Compiler;
+pub use error::{ZlangError, ZlangResult};
+pub use vm::{
+    AuditEvent, AuditOutcome, BytecodeModule, Capability, CapabilityPolicy, ExecutionReport,
+    Instruction, Register, VmLimits, ZVirtualMachine,
+};
