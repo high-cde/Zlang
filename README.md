@@ -1,415 +1,151 @@
-# zdos-zlang: Linguaggio di Sistema per ZDOS
+<div align="center">
 
-Questo repository contiene l'implementazione completa del linguaggio ZLang, una macchina virtuale (VM) a bytecode, la toolchain associata e le integrazioni con ZDOS e Discord. L'obiettivo è fornire un pacchetto completo per lo sviluppo di script, demoni e tool di orchestrazione nativi per il sistema operativo ZDOS.
+# ZLang
 
-## Indice
+### The Sovereign Execution Layer for ZDOS
 
-1.  [Identità del Linguaggio](#1-identità-del-linguaggio)
-2.  [Specifica del Linguaggio](#2-specifica-del-linguaggio)
-    *   [Tipi e Valori](#21-tipi-e-valori)
-    *   [Variabili e Assegnazione](#22-variabili-e-assegnazione)
-    *   [Funzioni](#23-funzioni)
-    *   [Controllo di Flusso](#24-controllo-di-flusso)
-    *   [Moduli](#25-moduli)
-    *   [Errori ed Eccezioni](#26-errori-ed-eccezioni)
-3.  [Grammatica (EBNF minimale)](#3-grammatica-ebnf-minimale)
-4.  [VM e Runtime](#4-vm-e-runtime)
-    *   [Modello](#41-modello)
-    *   [Formato Bytecode](#42-formato-bytecode)
-    *   [Set di Istruzioni Base](#43-set-di-istruzioni-base-estratto)
-    *   [Syscall ZDOS](#44-syscall-zdos)
-5.  [Implementazione: Struttura del Repository](#5-implementazione-struttura-del-repository)
-    *   [Repo Principale](#51-repo-principale)
-    *   [Toolchain](#52-toolchain)
-6.  [Integrazione con ZDOS](#6-integrazione-con-zdos)
-    *   [Installazione in ZDOS](#61-installazione-in-zdos)
-    *   [Wrapper Shell](#62-wrapper-shell)
-    *   [Registry ZDOS](#63-registry-zdos)
-    *   [Demoni ZDOS in ZLang](#64-demoni-zdos-in-zlang)
-7.  [Package Manager ZPM](#7-package-manager-zpm)
-    *   [File di Configurazione](#71-file-di-configurazione)
-    *   [Comandi](#72-comandi)
-8.  [Integrazione con Discord](#8-integrazione-con-discord)
-    *   [Architettura](#81-architettura)
-    *   [Flusso](#82-flusso)
-    *   [Sicurezza](#83-sicurezza)
-9.  [Esempio Completo: `chain_node.zlang`](#9-esempio-completo-chain_nodezlang)
-10. [Roadmap di Implementazione](#10-roadmap-di-implementazione)
+**Un linguaggio nativo per sistemi operativi, automazione governata e infrastrutture distribuite.**
 
----
+[![Repository](https://img.shields.io/badge/GitHub-high--cde%2FZlang-181717?logo=github)](https://github.com/high-cde/Zlang)
+[![Rust](https://img.shields.io/badge/implementation-Rust-dea584?logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![Status](https://img.shields.io/badge/status-prototype%20%7C%20active%20development-7c3aed)](https://github.com/high-cde/Zlang)
+[![Release](https://img.shields.io/badge/release-v2026.2.0-0b7285)](https://github.com/high-cde/Zlang/commits/main/)
+[![Stars](https://img.shields.io/github/stars/high-cde/Zlang?style=flat&logo=github)](https://github.com/high-cde/Zlang/stargazers)
+[![Issues](https://img.shields.io/github/issues/high-cde/Zlang?style=flat&logo=github)](https://github.com/high-cde/Zlang/issues)
+[![Whitepaper](https://img.shields.io/badge/read-Whitepaper-111827?logo=readthedocs&logoColor=white)](./ZLANG-WHITEPAPER.md)
 
-## 1. Identità del Linguaggio
+</div>
 
-**ZLang** è un linguaggio di sistema nativo progettato per ZDOS, ideale per scripting, demoni, orchestrazione di tool e la creazione di client/nodi blockchain. È un linguaggio interpretato con una VM a bytecode, garantendo portabilità su diverse architetture come Linux/Termux, vecchi x86 e ARM.
+> **ZLang non è soltanto un linguaggio. È un confine governato tra intenzione operativa e potere di sistema.**
 
--   **Nome**: ZLang
--   **Estensione file**: `.zlang`
--   **Ruolo**: Linguaggio di sistema nativo ZDOS, scripting, daemon, orchestrazione tool, client/nodi blockchain.
--   **Target**: Interprete + VM a bytecode, portabile su Linux/Termux, x86 vecchi, ARM.
+## Visione
 
-## 2. Specifica del Linguaggio
+I sistemi operativi moderni sono composti da shell, demoni, API, agenti, runtime e orchestratori. ZLang nasce per riunire questi livelli in un execution layer compatto, portabile e verificabile per l’ecosistema **ZDOS**.
 
-### 2.1. Tipi e Valori
+La sua tesi è semplice: **un sistema operativo sovrano ha bisogno di un linguaggio sovrano**. Un linguaggio capace di descrivere servizi, automazioni e operazioni privilegiate senza rinunciare a controllo, audit, policy e riproducibilità.
 
-ZLang supporta i seguenti tipi primitivi e literal:
+ZLang è progettato per scripting di sistema, demoni, orchestrazione di tool, runtime edge, networking e client o nodi blockchain. La visione tecnica comprende compilatore, bytecode, macchina virtuale, runtime, syscall ZDOS e package manager ZPM.
 
-| Tipo      | Descrizione                               |
-| :-------- | :---------------------------------------- |
-| `int`     | Intero a 64 bit                           |
-| `float`   | Virgola mobile a 64 bit                   |
-| `bool`    | Valori booleani (`true` / `false`)        |
-| `str`     | Stringhe UTF-8                            |
-| `bytes`   | Sequenze di byte                          |
-| `list`    | Liste eterogenee                          |
-| `map`     | Mappe con chiave `str` e valore generico  |
-| `func`    | Funzioni                                  |
+## Perché ZLang
 
-Esempi di literal:
+| Problema | Risposta ZLang |
+|---|---|
+| Script difficili da governare | Programmi strutturati, tipizzabili e sottoponibili a policy |
+| Runtime eterogenei | Bytecode e VM come contratto di portabilità |
+| Capacità di sistema implicite | Syscall esplicite, capability e confini di autorizzazione |
+| Demoni distribuiti senza uniformità | Runtime comune per servizi, agenti e automazioni |
+| Dipendenze non verificabili | ZPM, manifest, versionamento e artefatti firmabili |
+| Integrazioni remote rischiose | Whitelist, ruoli, audit e divieto di codice arbitrario |
 
-```zlang
-let a = 42
-let pi = 3.14
-let ok = true
-let name = "High"
-let data = 0xDEADBEEF
-let arr = [1, 2, 3]
-let cfg = { "id": "node-1", "port": 8080 }
+## Architettura
+
+```mermaid
+flowchart LR
+    A[Script .zlang] --> B[Lexer]
+    B --> C[Parser / AST]
+    C --> D[Type Checker]
+    D --> E[Code Generator]
+    E --> F[Bytecode ZBC0]
+    F --> G[ZLang VM]
+    G --> H[Runtime]
+    H --> I[Syscall ZDOS]
+    I --> J[Kernel / Registry / Services]
+    G --> K[Audit Log]
+    G --> L[Policy Engine]
+    M[ZPM] --> C
+    M --> F
 ```
 
-### 2.2. Variabili e Assegnazione
+### Componenti principali
 
-Le variabili possono essere dichiarate con `let` e opzionalmente tipizzate. La riassegnazione è supportata.
+| Componente | Funzione |
+|---|---|
+| `compiler/` | Lexer, parser, AST, type checking e code generation |
+| `vm/` | Bytecode, valori runtime, VM e syscall |
+| `runtime/` | Librerie standard per sistema, rete e filesystem |
+| `src/` | Entry point Rust e percorso runtime attivo |
+| `zpm/` | Package manager e modello di progetto |
+| `examples/` | Esempi di script, daemon e nodo chain |
+| `docs/` | Specifiche del linguaggio, bytecode e syscall |
 
-**Dichiarazione**:
+## Linguaggio
 
-```zlang
-let x = 10
-let msg: str = "hello"
-```
-
-**Riassegnazione**:
-
-```zlang
-x = x + 1
-```
-
-### 2.3. Funzioni
-
-Le funzioni sono definite con la parola chiave `func`, possono accettare parametri tipizzati e restituire un valore. Sono supportate anche le funzioni anonime.
-
-**Definizione**:
-
-```zlang
-func add(a: int, b: int) -> int {
-    return a + b
-}
-
-func log_system(msg: str) {
-    sys.log("core", msg)
-}
-```
-
-**Funzioni anonime**:
-
-```zlang
-let f = func(x: int) -> int {
-    return x * 2
-}
-```
-
-### 2.4. Controllo di Flusso
-
-ZLang include costrutti per il controllo di flusso come `if/else`, `for` e `while`.
-
-```zlang
-if x > 5 {
-    sys.log("test", "x > 5")
-} else {
-    sys.log("test", "x <= 5")
-}
-
-for i in 0..10 {
-    sys.log("loop", "i=" + str(i))
-}
-
-while x < 100 {
-    x = x + 10
-}
-```
-
-### 2.5. Moduli
-
-I moduli permettono di organizzare il codice e gestire le dipendenze.
-
-**Dichiarazione modulo**:
+La specifica di ZLang prevede una sintassi compatta con variabili, funzioni, moduli, import, controllo di flusso, gestione degli errori e strutture dati.
 
 ```zlang
 module chain.node
-```
-
-**Import**:
-
-```zlang
-import sys
-import net
-import chain.util
-```
-
-### 2.6. Errori ed Eccezioni
-
-La gestione degli errori avviene tramite `throw` e `try/catch`.
-
-```zlang
-func risky() {
-    if something_wrong {
-        throw "bad state"
-    }
-}
-
-func main() {
-    try {
-        risky()
-    n    } catch err {
-        sys.log("err", "caught: " + err)
-    }
-}
-```
-
-## 3. Grammatica (EBNF minimale)
-
-La grammatica di ZLang è definita in EBNF:
-
-```ebnf
-Program      = { Statement } ;
-
-Statement    = VarDecl | Assign | FuncDecl | IfStmt | ForStmt | WhileStmt
-             | ImportStmt | ModuleStmt | ExprStmt | ThrowStmt | TryCatch ;
-
-VarDecl      = "let" Identifier [ ":" Type ] "=" Expression ;
-Assign       = Identifier "=" Expression ;
-FuncDecl     = "func" Identifier "(" [ ParamList ] ")" [ "->" Type ] Block ;
-ParamList    = Param { "," Param } ;
-Param        = Identifier ":" Type ;
-
-IfStmt       = "if" Expression Block [ "else" Block ] ;
-ForStmt      = "for" Identifier "in" Expression ".." Expression Block ;
-WhileStmt    = "while" Expression Block ;
-
-ImportStmt   = "import" Identifier { "." Identifier } ;
-ModuleStmt   = "module" Identifier { "." Identifier } ;
-
-ThrowStmt    = "throw" Expression ;
-TryCatch     = "try" Block "catch" Identifier Block ;
-
-Block        = "{" { Statement } "}" ;
-
-ExprStmt     = Expression ;
-
-Expression   = LogicOr ;
-LogicOr      = LogicAnd { "||" LogicAnd } ;
-LogicAnd     = Equality { "&&" Equality } ;
-Equality     = Relational { ("==" | "!=") Relational } ;
-Relational   = Additive { ("<" | ">" | "<=" | ">=") Additive } ;
-Additive     = Multiplicative { ("+" | "-") Multiplicative } ;
-Multiplicative = Unary { ("*" | "/" | "%") Unary } ;
-Unary        = [ "!" | "-" ] Primary ;
-Primary      = Literal
-             | Identifier
-             | "(" Expression ")"
-             | Primary "." Identifier
-             | Primary "(" [ ArgList ] ")" ;
-
-ArgList      = Expression { "," Expression } ;
-
-Literal      = IntLiteral | FloatLiteral | StringLiteral
-             | BoolLiteral | ListLiteral | MapLiteral ;
-
-ListLiteral  = "[" [ Expression { "," Expression } ] "]" ;
-MapLiteral   = "{" [ StringLiteral ":" Expression { "," StringLiteral ":" Expression } ] "}" ;
-
-Type         = "int" | "float" | "bool" | "str" | "bytes" | "list" | "map" | "func" ;
-
-Identifier   = Letter { Letter | Digit | "_" } ;
-```
-
-## 4. VM e Runtime
-
-### 4.1. Modello
-
-La VM di ZLang è basata su stack e include registri interni come `IP` (instruction pointer), `SP` (stack pointer) e `FP` (frame pointer). La memoria è divisa in segmenti per codice (bytecode), heap (oggetti) e stack (valori e frame di chiamata).
-
-### 4.2. Formato Bytecode
-
-Il formato del bytecode compilato include un header (`ZBC0`, versione), tabelle per costanti e simboli, e una sezione codice con un array di istruzioni. Ogni istruzione è composta da 1 byte di opcode e 0-8 byte di operandi.
-
-### 4.3. Set di Istruzioni Base (Estratto)
-
-Il set di istruzioni include operazioni per stack, variabili, aritmetica, logica, controllo di flusso e strutture dati.
-
-| Categoria    | Istruzioni                                                                |
-| :----------- | :------------------------------------------------------------------------ |
-| **Stack**    | `PUSH_CONST idx`, `POP`                                                   |
-| **Variabili**| `LOAD_LOCAL idx`, `STORE_LOCAL idx`, `LOAD_GLOBAL idx`, `STORE_GLOBAL idx`|
-| **Operazioni**| `ADD`, `SUB`, `MUL`, `DIV`, `MOD`, `EQ`, `NEQ`, `LT`, `GT`, `LE`, `GE`, `AND`, `OR`, `NOT` |
-| **Controllo**| `JMP addr`, `JMPIFFALSE addr`, `CALL func_idx, argc`, `RET`               |
-| **Strutture**| `NEW_LIST n`, `NEW_MAP n`, `GET_INDEX`, `SET_INDEX`                       |
-| **Syscall**  | `SYS_CALL id, argc` (per `sys.`, `net.`, ecc.)                            |
-
-### 4.4. Syscall ZDOS
-
-Le syscall ZDOS permettono a ZLang di interagire con il sistema operativo. Esempi includono:
-
-| Syscall        | Funzione ZLang corrispondente                               |
-| :------------- | :---------------------------------------------------------- |
-| `SYS_LOG`      | `sys.log(tag, msg)`                                         |
-| `SYS_EXEC`     | `sys.exec(cmd, args)`                                       |
-| `SYSEXECCAPTURE`| (Non specificato)                                           |
-| `SYSREGGET`    | `sys.registry.get(key)`                                     |
-| `SYSREGSET`    | (Non specificato)                                           |
-| `SYSEVENTEMIT` | (Non specificato)                                           |
-| `SYSTIMENOW`   | (Non specificato)                                           |
-| `SYSNETCONNECT`| (Non specificato)                                           |
-| `SYSNETSEND`   | (Non specificato)                                           |
-| `SYSNETRECV`   | (Non specificato)                                           |
-
-## 5. Implementazione: Struttura del Repository
-
-### 5.1. Repo Principale
-
-Il repository `zdos-zlang` è organizzato come segue:
-
-```
-zdos-zlang/
-├── compiler/             # Componenti del compilatore (lexer, parser, AST, codegen)
-│   ├── lexer.rs
-│   ├── parser.rs
-│   ├── ast.rs
-│   ├── typecheck.rs      # (Opzionale/estendibile)
-│   └── codegen.rs        # (AST → bytecode)
-├── vm/                   # Implementazione della macchina virtuale
-│   ├── vm.rs
-│   ├── bytecode.rs
-│   ├── value.rs
-│   └── syscalls.rs
-├── runtime/              # Librerie standard ZLang
-│   ├── stdlib_sys.zlang
-│   ├── stdlib_net.zlang
-│   └── stdlib_fs.zlang
-├── cli/                  # Interfaccia a riga di comando (CLI) di ZLang
-│   └── main.rs           # (zlang CLI)
-├── examples/             # Esempi di codice ZLang
-│   ├── hello.zlang
-│   ├── daemon_logger.zlang
-│   └── chain_node.zlang
-├── docs/                 # Documentazione del progetto
-│   ├── language-spec.md
-│   ├── bytecode-spec.md
-│   └── syscalls.md
-└── zpm/                  # Package manager ZLang (zpm)
-    └── zpm.rs
-```
-
-### 5.2. Toolchain
-
-Il linguaggio di implementazione è **Rust**. La build e i comandi CLI sono gestiti come segue:
-
-**Build**:
-
-```bash
-cargo build --release
-# Produce: target/release/zlang
-```
-
-**Comandi CLI**:
-
-```bash
-# Esegui script
-zlang run file.zlang
-
-# Compila in bytecode
-zlang build file.zlang -o file.zbc
-
-# Esegui bytecode
-zlang exec file.zbc
-```
-
-## 6. Integrazione con ZDOS
-
-### 6.1. Installazione in ZDOS
-
-ZLang si integra con ZDOS seguendo percorsi standard:
-
--   **Binario**: `/usr/local/bin/zlang`
--   **Stdlib**: `/opt/zdos/zlang/stdlib/`
--   **Config**: `/etc/zdos/zlang.conf`
-
-### 6.2. Wrapper Shell
-
-Uno script wrapper `zlang.sh` facilita l'esecuzione di ZLang in ZDOS:
-
-```sh
-#!/bin/sh
-exec /usr/local/bin/zlang "$@"
-```
-
-Questo permette comandi come:
-
-```bash
-zlang run /opt/zdos/scripts/boot.zlang
-```
-
-### 6.3. Registry ZDOS
-
-ZLang può accedere al Registry ZDOS per configurazioni e dati di sistema:
-
-```zlang
-let node_cfg = sys.registry.get("chain.node")
-sys.log("cfg", "id=" + node_cfg["id"])
-```
-
-L'implementazione di `SYSREGGET` e `SYSREGSET` mappa su file YAML/JSON in `/etc/zdos/registry/` o su un demone ZDOS.
-
-### 6.4. Demoni ZDOS in ZLang
-
-È possibile implementare demoni ZDOS direttamente in ZLang, come l'esempio `zdos-chain-daemon.zlang`:
-
-```zlang
-module zdos.chain.daemon
 
 import sys
 import net
 
 func main() {
-    sys.log("chain-daemon", "starting")
+    sys.log("chain.node", "boot")
 
     let cfg = sys.registry.get("chain.node")
-    start_node(cfg)
+    sys.log("chain.node", "node online")
 
     while true {
-        tick()
+        tick(cfg)
         sys.sleep(1000)
     }
 }
-
-func start_node(cfg) {
-    sys.log("chain-daemon", "node id=" + cfg["id"])
-    // init networking, peers, ecc.
-}
-
-func tick() {
-    // logica periodica
-}
 ```
 
-Questi demoni possono essere avviati da ZDOS all'avvio del sistema.
+I tipi documentati includono `int`, `float`, `bool`, `str`, `bytes`, `list`, `map` e `func`. Gli operatori previsti coprono aritmetica, confronti, logica, chiamate e accesso a strutture dati. [1]
 
-## 7. Package Manager ZPM
+## Esecuzione
 
-**zpm** è il package manager per ZLang, gestisce dipendenze e build dei progetti.
+Il flusso concettuale è:
 
-### 7.1. File di Configurazione
+```text
+.zlang source
+     ↓
+lexer → parser → AST → type checker
+     ↓
+bytecode ZBC0
+     ↓
+ZLang VM
+     ↓
+runtime + syscall ZDOS
+```
 
-Ogni progetto ZLang utilizza un file `zpm.toml` per la configurazione:
+La documentazione prevede una CLI con comandi per eseguire script, compilare bytecode ed eseguire artefatti compilati:
+
+```bash
+# Build del progetto Rust
+cargo build --release
+
+# Esecuzione dello script, secondo la CLI prevista
+zlang run examples/hello.zlang
+
+# Compilazione in bytecode, secondo la CLI prevista
+zlang build examples/hello.zlang -o build/hello.zbc
+
+# Esecuzione del bytecode, secondo la CLI prevista
+zlang exec build/hello.zbc
+```
+
+> **Nota sullo stato:** il repository è in sviluppo attivo. La specifica descrive una superficie linguistica più ampia del percorso esecutivo prototipale attualmente collegato al binario principale. Per una valutazione precisa, consultare la [whitepaper tecnica](./ZLANG-WHITEPAPER.md) e la documentazione in `docs/`.
+
+## Sicurezza come architettura
+
+ZLang tratta le capacità di sistema come privilegi espliciti, non come effetti collaterali invisibili.
+
+| Superficie | Controllo previsto |
+|---|---|
+| Filesystem | Scope di lettura/scrittura e directory autorizzate |
+| Networking | Endpoint, protocolli e timeout dichiarati |
+| Processi | Comandi consentiti e limiti di esecuzione |
+| Registry | Chiavi e operazioni autorizzate |
+| Risorse | Memoria, tempo, file descriptor e retry |
+| Esecuzione remota | Script registrati, whitelist e ruoli |
+| Audit | Identità dello script, versione, syscall ed esito |
+
+Per le integrazioni remote, il progetto adotta un principio essenziale: **mai eseguire codice arbitrario ricevuto direttamente da un canale esterno**. Un bot, un webhook o un daemon devono riferirsi a script registrati, versionati e autorizzati.
+
+## ZPM: il package manager come registro d’identità
+
+ZPM è progettato per gestire manifest, dipendenze e build di progetti ZLang.
 
 ```toml
 [package]
@@ -422,104 +158,133 @@ net = "core"
 sys = "core"
 ```
 
-### 7.2. Comandi
+In una release matura, ZPM dovrebbe estendere questo modello con capability richieste, compatibilità del runtime, hash degli artefatti, firme dei maintainer e build riproducibili.
 
-| Comando      | Descrizione                                       |
-| :----------- | :------------------------------------------------ |
-| `zpm init`   | Inizializza un nuovo progetto ZLang               |
-| `zpm build`  | Compila il progetto in bytecode (`build/chain-node.zbc`) |
-| `zpm run`    | Esegue lo script principale (`src/main.zlang`)    |
+## Casi d’uso
 
-## 8. Integrazione con Discord
+### Demoni ZDOS
 
-L'integrazione con Discord avviene tramite un repository separato, `zdos-discord-bridge`.
+Servizi persistenti capaci di leggere configurazioni, emettere log, interagire con il registry e mantenere cicli operativi controllati.
 
-### 8.1. Architettura
+### Orchestrazione di sistema
 
--   **Repo**: `zdos-discord-bridge`
--   **Componenti**:
-    -   Bot Discord (Node.js o Python)
-    -   Daemon locale `zlang-daemon` che riceve richieste (es. via HTTP/gRPC), esegue script ZLang e restituisce output/log.
+Workflow riproducibili per verificare prerequisiti, avviare processi, gestire errori, applicare retry e produrre audit log.
 
-### 8.2. Flusso
+### Edge e dispositivi eterogenei
 
-1.  L'utente su Discord invia un comando: `!zdos run chain.status`
-2.  Il Bot Discord chiama `zlang-daemon` con lo script da eseguire (o il nome di uno script pre-registrato) e i parametri.
-3.  `zlang-daemon` esegue:
+Un runtime compatto e un bytecode versionato possono offrire una superficie comune tra Linux, Termux, ARM e sistemi x86 legacy, nei limiti delle syscall disponibili.
 
-    ```bash
-    zlang run /opt/zdos/scripts/chain_status.zlang
-    ```
+### Infrastrutture distribuite
 
-4.  L'output viene raccolto e rimandato al bot Discord.
+Client, agenti e nodi che coordinano networking, configurazione, eventi, telemetria e interazioni con servizi distribuiti.
 
-### 8.3. Sicurezza
+## SpaceX, Starlink e il contesto orbitale
 
-Per garantire la sicurezza:
+ZLang include riferimenti concettuali a networking, nodi distribuiti e scenari orbitali. Questi riferimenti appartengono alla **visione applicativa e all’ispirazione tecnica** del progetto; non costituiscono una partnership, integrazione ufficiale o affiliazione con SpaceX o Starlink.
 
--   Solo script whitelisted in `/etc/zdos/discord-allowed-scripts.json` possono essere eseguiti.
--   Nessuna esecuzione arbitraria di codice inviato da Discord è permessa.
--   I ruoli Discord sono mappati a permessi (es. gli admin possono avviare/fermare demoni).
+Per contesto esterno:
 
-## 9. Esempio Completo: `chain_node.zlang`
+- [SpaceX](https://www.spacex.com/) descrive pubblicamente la propria attività nello sviluppo e lancio di razzi e veicoli spaziali.
+- [Starlink Technology](https://www.starlink.com/technology) presenta la propria rete come una costellazione satellitare in orbita bassa orientata alla connettività a banda larga.
+- Gli [aggiornamenti ufficiali di SpaceX](https://www.spacex.com/updates) forniscono il contesto pubblico sulle attività di lancio e sulle missioni dell’azienda.
 
-Un esempio di nodo blockchain implementato in ZLang:
+ZLang può essere discusso in relazione a questi scenari come **execution layer concettuale per sistemi distribuiti, edge e connettività resiliente**. Non deve essere presentato come tecnologia SpaceX/Starlink né come prodotto approvato, sponsorizzato o utilizzato da tali organizzazioni.
 
-```zlang
-module chain.node
+## Stato del progetto
 
-import sys
-import net
+| Area | Stato |
+|---|---|
+| Visione e posizionamento | Definiti |
+| Specifica linguistica | Documentata e in evoluzione |
+| Struttura compilatore/VM | Presente nel repository |
+| Percorso esecutivo attivo | Prototipale |
+| Bytecode binario completo | In consolidamento |
+| Syscall ZDOS | Specifica concettuale da stabilizzare come ABI |
+| ZPM | Direzione progettuale iniziale |
+| CI e test cross-platform | Da consolidare |
 
-func main() {
-    sys.log("chain.node", "boot")
+ZLang è attualmente un **prototipo avanzato con specifica estesa**. La roadmap pubblica privilegia la trasparenza: ogni funzionalità deve passare dalla visione documentale a un’implementazione testata, osservabile e riproducibile.
 
-    let cfg = sys.registry.get("chain.node")
-    sys.log("chain.node", "id=" + cfg["id"] + " port=" + str(cfg["port"]))
+## Roadmap
 
-    init_network(cfg)
-    loop()
-}
+### Phase I — Verified Foundation
 
-func init_network(cfg) {
-    sys.log("chain.node", "init network")
-    // net.bind, net.connect peers, ecc.
-}
+Unificare il percorso sorgente, rendere riproducibile la build e aggiungere test automatici per lexer, parser, compilatore, VM ed esempi.
 
-func loop() {
-    while true {
-        process_incoming()
-        produceblockif_needed()
-        sys.sleep(500)
-    }
-}
+### Phase II — Language MVP
 
-func process_incoming() {
-    // placeholder: leggere messaggi, tx, ecc.
-}
+Consolidare numeri, stringhe, variabili, funzioni, condizioni, cicli, moduli ed error handling.
 
-func produceblockif_needed() {
-    // placeholder: logica consenso/produzione blocchi
-}
+### Phase III — Stable Bytecode
+
+Stabilizzare header, opcode, serializzazione, versionamento, compatibilità e limiti di risorsa.
+
+### Phase IV — Capability Security
+
+Collegare syscall e policy a capability verificabili, con audit, timeout e controlli per filesystem, rete, processi e registry.
+
+### Phase V — Ecosystem
+
+Rendere ZPM riproducibile, introdurre pacchetti firmati, librerie standard e aggiornamenti verificati.
+
+### Phase VI — Sovereign Distribution
+
+Portare il runtime su architetture eterogenee e scenari edge/distribuiti con profili di compatibilità documentati.
+
+## Repository map
+
+```text
+Zlang/
+├── compiler/             # Lexer, parser, AST, typecheck e codegen
+├── vm/                   # VM, bytecode, valori e syscall
+├── runtime/              # Librerie standard ZLang
+├── src/                  # Entry point e runtime attivo
+├── zpm/                  # Package manager
+├── examples/             # Script dimostrativi
+├── docs/                 # Specifiche tecniche
+├── ZLANG-WHITEPAPER.md   # Whitepaper strategica e tecnica
+└── one-shot-zlang.sh     # Validazione locale con backup, senza push automatico
 ```
 
-## 10. Roadmap di Implementazione
+## Quick start
 
-La roadmap per l'implementazione di ZLang e del suo ecosistema include i seguenti passi:
+```bash
+git clone https://github.com/high-cde/Zlang.git
+cd Zlang
 
-1.  Creazione del repository `zdos-zlang`.
-2.  Implementazione del lexer secondo la grammatica definita.
-3.  Implementazione del parser per generare l'AST.
-4.  Implementazione di un interprete diretto dell'AST per il debug iniziale.
-5.  Definizione del formato bytecode (`bytecode-spec.md`).
-6.  Implementazione del codegen (AST → bytecode).
-7.  Implementazione della VM stack-based con il set di istruzioni base.
-8.  Implementazione delle syscalls ZDOS (`sys.log`, `sys.exec`, `sys.registry.`, `sys.event.`).
-9.  Scrittura della libreria standard base (`sys`, `net`, `fs`) in parte nativa, in parte ZLang.
-10. Implementazione della CLI `zlang` (`run`, `build`, `exec`).
-11. Integrazione in ZDOS (percorsi di installazione, wrapper shell, demoni ZLang).
-12. Creazione di `zpm` (parsing `zpm.toml`, comandi `init`, `build`, `run`).
-13. Creazione del repository `zdos-discord-bridge` (bot Discord, daemon `zlang-daemon`, whitelist script).
-14. Scrittura di script reali (`chain_node.zlang`, `chain_status.zlang`, script di manutenzione ZDOS).
+# Procedura locale sicura: backup, controlli e report.
+./one-shot-zlang.sh
 
-Questo percorso fornisce una base solida per iniziare a scrivere codice senza ulteriori decisioni concettuali.
+# Build quando Rust/Cargo è disponibile.
+cargo build --release
+```
+
+La procedura `one-shot-zlang.sh` non cancella `src/`, non esegue push remoto automatico e crea un backup datato prima dei controlli.
+
+## Contribuire
+
+Il contributo più utile è trasformare la specifica in comportamento verificabile. Prima di proporre una modifica, descrivere il caso d’uso, il comportamento previsto, gli errori possibili, le implicazioni di sicurezza e il test associato.
+
+Le contribuzioni dovrebbero mantenere separati il core della VM, il runtime, le syscall ZDOS e gli strumenti dell’ecosistema. Ogni nuova syscall dovrebbe avere una specifica, un identificatore stabile, un contratto degli argomenti, codici d’errore e almeno un test.
+
+## Licenza e marchi
+
+Verificare il file di licenza del repository prima di redistribuire il codice. **SpaceX**, **Starlink** e i relativi nomi e marchi appartengono ai rispettivi titolari. I riferimenti in questo README hanno esclusivamente funzione contestuale e informativa; non implicano endorsement, partnership o affiliazione.
+
+## Documentazione e riferimenti
+
+- [Whitepaper ZLang](./ZLANG-WHITEPAPER.md)
+- [Specifiche del linguaggio](./docs/language-spec.md)
+- [Specifiche del bytecode](./docs/bytecode-spec.md)
+- [Syscall ZDOS](./docs/syscalls.md)
+- [Script one-shot sicuro](./one-shot-zlang.sh)
+- [SpaceX — sito ufficiale](https://www.spacex.com/)
+- [Starlink — tecnologia](https://www.starlink.com/technology)
+- [SpaceX — aggiornamenti](https://www.spacex.com/updates)
+
+## Riferimenti
+
+[1]: ./docs/language-spec.md "ZLang language specification"
+[2]: ./docs/bytecode-spec.md "ZLang bytecode specification"
+[3]: ./docs/syscalls.md "ZLang syscall documentation"
+[4]: ./ZLANG-WHITEPAPER.md "ZLang technical whitepaper"

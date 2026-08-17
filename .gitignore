@@ -1,0 +1,11 @@
+# Local safety artifacts
+.zlang-backups/
+one-shot-report-*.md
+
+# Rust build artifacts
+target/
+
+# Editor and OS files
+.DS_Store
+.idea/
+.vscode/
