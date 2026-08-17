@@ -60,13 +60,13 @@ flowchart LR
 
 | Componente | Funzione |
 |---|---|
-| `compiler/` | Lexer, parser, AST, type checking e code generation |
-| `vm/` | Bytecode, valori runtime, VM e syscall |
-| `runtime/` | Librerie standard per sistema, rete e filesystem |
-| `src/` | Entry point Rust e percorso runtime attivo |
-| `zpm/` | Package manager e modello di progetto |
-| `examples/` | Esempi di script, daemon e nodo chain |
-| `docs/` | Specifiche del linguaggio, bytecode e syscall |
+| `src/compiler/` | Compilatore attivo e generazione delle istruzioni runtime supportate |
+| `src/lexer.rs` e `src/parser.rs` | Tokenizzazione e parser del sottoinsieme aritmetico di riferimento |
+| `src/vm/` | Macchina virtuale del percorso esecutivo attivo |
+| `src/zpm/` | Primitive dimostrative per il package/runtime layer |
+| `tests/` | Test di integrazione per linguaggio, compilatore e CLI |
+| `examples/` | Esempio di nodo chain concettuale |
+| `docs/` | Indice, specifiche tecniche e wiki operativa |
 
 ## Linguaggio
 
@@ -115,14 +115,12 @@ La documentazione prevede una CLI con comandi per eseguire script, compilare byt
 # Build del progetto Rust
 cargo build --release
 
-# Esecuzione dello script, secondo la CLI prevista
-zlang run examples/hello.zlang
+# Esecuzione di uno script supportato dal runtime attivo
+./target/release/zlang test.zl
 
-# Compilazione in bytecode, secondo la CLI prevista
-zlang build examples/hello.zlang -o build/hello.zbc
-
-# Esecuzione del bytecode, secondo la CLI prevista
-zlang exec build/hello.zbc
+# Esempio con sorgente temporaneo
+printf 'emit hello\norbit_sync\n' > /tmp/hello.zl
+./target/release/zlang /tmp/hello.zl
 ```
 
 > **Nota sullo stato:** il repository è in sviluppo attivo. La specifica descrive una superficie linguistica più ampia del percorso esecutivo prototipale attualmente collegato al binario principale. Per una valutazione precisa, consultare la [whitepaper tecnica](https://raw.githubusercontent.com/high-cde/Zlang/main/ZLANG-WHITEPAPER.md) e la documentazione in `docs/`.
@@ -235,14 +233,13 @@ Portare il runtime su architetture eterogenee e scenari edge/distribuiti con pro
 
 ```text
 Zlang/
-├── compiler/             # Lexer, parser, AST, typecheck e codegen
-├── vm/                   # VM, bytecode, valori e syscall
-├── runtime/              # Librerie standard ZLang
-├── src/                  # Entry point e runtime attivo
-├── zpm/                  # Package manager
-├── examples/             # Script dimostrativi
-├── docs/                 # Specifiche tecniche
+├── src/                  # Unico percorso sorgente Rust attivo
+├── tests/                # Test di integrazione per lexer, parser, compilatore e CLI
+├── examples/             # Esempio di nodo chain concettuale
+├── docs/                 # Indice, specifiche tecniche e wiki operativa
+├── .github/workflows/    # Verifica continua di format, check, test e Clippy
 ├── ZLANG-WHITEPAPER.md   # Whitepaper strategica e tecnica
+├── Cargo.toml            # Manifest del pacchetto Rust
 └── one-shot-zlang.sh     # Validazione locale con backup, senza push automatico
 ```
 
@@ -259,7 +256,7 @@ cd Zlang
 cargo build --release
 ```
 
-La procedura `one-shot-zlang.sh` non cancella `src/`, non esegue push remoto automatico e crea un backup datato prima dei controlli.
+La procedura `one-shot-zlang.sh` non cancella sorgenti, non esegue push remoto automatico e crea un backup datato prima dei controlli.
 
 ## Contribuire
 
@@ -273,6 +270,7 @@ Verificare il file di licenza del repository prima di redistribuire il codice. *
 
 ## Documentazione e riferimenti
 
+- [Indice della documentazione](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/README.md)
 - [Whitepaper ZLang](https://raw.githubusercontent.com/high-cde/Zlang/main/ZLANG-WHITEPAPER.md)
 - [Specifiche del linguaggio](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/language-spec.md)
 - [Specifiche del bytecode](https://raw.githubusercontent.com/high-cde/Zlang/main/docs/bytecode-spec.md)

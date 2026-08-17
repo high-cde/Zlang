@@ -27,12 +27,6 @@ git diff --binary > "$BACKUP_DIR/working-tree.patch" || true
 git ls-files -z | tar --null -T - -czf "$BACKUP_DIR/tracked-files.tar.gz"
 printf '[ZLANG] Backup creato.\n'
 
-# L’autobuild storico cancellava src/ e faceva push automatico. Qui viene solo disattivato
-# il comportamento pericoloso e viene mantenuta una copia consultabile dello script originale.
-if [ -f autobuild-zlang.sh ]; then
-  cp autobuild-zlang.sh "$BACKUP_DIR/autobuild-zlang.original.sh"
-fi
-
 if command -v cargo >/dev/null 2>&1; then
   cargo fmt --all -- --check
   cargo check --all-targets
@@ -86,7 +80,7 @@ ${DIFFSTAT:-nessuna modifica non committata}
 
 ## Sicurezza
 
-La procedura non esegue \`git push\`, non rimuove \`src/\` e non sovrascrive file sorgente. Il vecchio \`autobuild-zlang.sh\` viene soltanto conservato nel backup per revisione.
+La procedura non esegue \`git push\`, non rimuove sorgenti e non sovrascrive file del progetto.
 EOF
 
 printf '[ZLANG] Controlli completati. Report: %s\n' "$REPORT"
