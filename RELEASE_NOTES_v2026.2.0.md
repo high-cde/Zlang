@@ -19,8 +19,8 @@ ZLang è un prototipo avanzato con specifica estesa e implementazione in consoli
 
 ## Documentazione
 
-- [README](./README.md)
-- [Whitepaper](./ZLANG-WHITEPAPER.md)
-- [Language specification](./docs/language-spec.md)
-- [Bytecode specification](./docs/bytecode-spec.md)
-- [Syscalls](./docs/syscalls.md)
+- [README](https://github.com/high-cde/Zlang/blob/main/README.md)
+- [Whitepaper](https://github.com/high-cde/Zlang/blob/main/ZLANG-WHITEPAPER.md)
+- [Language specification](https://github.com/high-cde/Zlang/blob/main/docs/language-spec.md)
+- [Bytecode specification](https://github.com/high-cde/Zlang/blob/main/docs/bytecode-spec.md)
+- [Syscalls](https://github.com/high-cde/Zlang/blob/main/docs/syscalls.md)

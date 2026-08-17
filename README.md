@@ -9,10 +9,10 @@
 [![Repository](https://img.shields.io/badge/GitHub-high--cde%2FZlang-181717?logo=github)](https://github.com/high-cde/Zlang)
 [![Rust](https://img.shields.io/badge/implementation-Rust-dea584?logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![Status](https://img.shields.io/badge/status-prototype%20%7C%20active%20development-7c3aed)](https://github.com/high-cde/Zlang)
-[![Release](https://img.shields.io/badge/release-v2026.2.0-0b7285)](https://github.com/high-cde/Zlang/commits/main/)
+[![Release](https://img.shields.io/badge/release-v2026.2.0-0b7285)](https://github.com/high-cde/Zlang/releases/tag/v2026.2.0)
 [![Stars](https://img.shields.io/github/stars/high-cde/Zlang?style=flat&logo=github)](https://github.com/high-cde/Zlang/stargazers)
 [![Issues](https://img.shields.io/github/issues/high-cde/Zlang?style=flat&logo=github)](https://github.com/high-cde/Zlang/issues)
-[![Whitepaper](https://img.shields.io/badge/read-Whitepaper-111827?logo=readthedocs&logoColor=white)](./ZLANG-WHITEPAPER.md)
+[![Whitepaper](https://img.shields.io/badge/read-Whitepaper-111827?logo=readthedocs&logoColor=white)](https://github.com/high-cde/Zlang/blob/main/ZLANG-WHITEPAPER.md)
 
 </div>
 
@@ -125,7 +125,7 @@ zlang build examples/hello.zlang -o build/hello.zbc
 zlang exec build/hello.zbc
 ```
 
-> **Nota sullo stato:** il repository è in sviluppo attivo. La specifica descrive una superficie linguistica più ampia del percorso esecutivo prototipale attualmente collegato al binario principale. Per una valutazione precisa, consultare la [whitepaper tecnica](./ZLANG-WHITEPAPER.md) e la documentazione in `docs/`.
+> **Nota sullo stato:** il repository è in sviluppo attivo. La specifica descrive una superficie linguistica più ampia del percorso esecutivo prototipale attualmente collegato al binario principale. Per una valutazione precisa, consultare la [whitepaper tecnica](https://github.com/high-cde/Zlang/blob/main/ZLANG-WHITEPAPER.md) e la documentazione in `docs/`.
 
 ## Sicurezza come architettura
 
@@ -273,18 +273,18 @@ Verificare il file di licenza del repository prima di redistribuire il codice. *
 
 ## Documentazione e riferimenti
 
-- [Whitepaper ZLang](./ZLANG-WHITEPAPER.md)
-- [Specifiche del linguaggio](./docs/language-spec.md)
-- [Specifiche del bytecode](./docs/bytecode-spec.md)
-- [Syscall ZDOS](./docs/syscalls.md)
-- [Script one-shot sicuro](./one-shot-zlang.sh)
+- [Whitepaper ZLang](https://github.com/high-cde/Zlang/blob/main/ZLANG-WHITEPAPER.md)
+- [Specifiche del linguaggio](https://github.com/high-cde/Zlang/blob/main/docs/language-spec.md)
+- [Specifiche del bytecode](https://github.com/high-cde/Zlang/blob/main/docs/bytecode-spec.md)
+- [Syscall ZDOS](https://github.com/high-cde/Zlang/blob/main/docs/syscalls.md)
+- [Script one-shot sicuro](https://github.com/high-cde/Zlang/blob/main/one-shot-zlang.sh)
 - [SpaceX — sito ufficiale](https://www.spacex.com/)
 - [Starlink — tecnologia](https://www.starlink.com/technology)
 - [SpaceX — aggiornamenti](https://www.spacex.com/updates)
 
 ## Riferimenti
 
-[1]: ./docs/language-spec.md "ZLang language specification"
-[2]: ./docs/bytecode-spec.md "ZLang bytecode specification"
-[3]: ./docs/syscalls.md "ZLang syscall documentation"
-[4]: ./ZLANG-WHITEPAPER.md "ZLang technical whitepaper"
+[1]: https://github.com/high-cde/Zlang/blob/main/docs/language-spec.md "ZLang language specification"
+[2]: https://github.com/high-cde/Zlang/blob/main/docs/bytecode-spec.md "ZLang bytecode specification"
+[3]: https://github.com/high-cde/Zlang/blob/main/docs/syscalls.md "ZLang syscall documentation"
+[4]: https://github.com/high-cde/Zlang/blob/main/ZLANG-WHITEPAPER.md "ZLang technical whitepaper"
