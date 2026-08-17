@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use crate::zpm;
+use std::collections::HashMap;
 
 pub struct ZVirtualMachine {
     pub memory: HashMap<String, String>,
@@ -7,7 +7,9 @@ pub struct ZVirtualMachine {
 
 impl ZVirtualMachine {
     pub fn new() -> Self {
-        ZVirtualMachine { memory: HashMap::new() }
+        ZVirtualMachine {
+            memory: HashMap::new(),
+        }
     }
 
     pub fn execute(&mut self, bytecode: Vec<String>) {

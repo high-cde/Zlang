@@ -24,8 +24,12 @@ pub fn parse(tokens: Vec<Token>) -> AST {
     let mut stmts = Vec::new();
 
     while q.front().is_some() {
-        while matches!(q.front(), Some(Token::Newline)) { q.pop_front(); }
-        if q.front().is_none() { break; }
+        while matches!(q.front(), Some(Token::Newline)) {
+            q.pop_front();
+        }
+        if q.front().is_none() {
+            break;
+        }
         stmts.push(parse_stmt(&mut q));
     }
 
@@ -62,8 +66,14 @@ fn parse_expr(q: &mut VecDeque<Token>) -> AST {
     let mut node = parse_term(q);
     loop {
         match q.front() {
-            Some(Token::Plus) => { q.pop_front(); node = AST::Add(Box::new(node), Box::new(parse_term(q))); }
-            Some(Token::Minus) => { q.pop_front(); node = AST::Sub(Box::new(node), Box::new(parse_term(q))); }
+            Some(Token::Plus) => {
+                q.pop_front();
+                node = AST::Add(Box::new(node), Box::new(parse_term(q)));
+            }
+            Some(Token::Minus) => {
+                q.pop_front();
+                node = AST::Sub(Box::new(node), Box::new(parse_term(q)));
+            }
             _ => break,
         }
     }
@@ -74,8 +84,14 @@ fn parse_term(q: &mut VecDeque<Token>) -> AST {
     let mut node = parse_factor(q);
     loop {
         match q.front() {
-            Some(Token::Star) => { q.pop_front(); node = AST::Mul(Box::new(node), Box::new(parse_factor(q))); }
-            Some(Token::Slash) => { q.pop_front(); node = AST::Div(Box::new(node), Box::new(parse_factor(q))); }
+            Some(Token::Star) => {
+                q.pop_front();
+                node = AST::Mul(Box::new(node), Box::new(parse_factor(q)));
+            }
+            Some(Token::Slash) => {
+                q.pop_front();
+                node = AST::Div(Box::new(node), Box::new(parse_factor(q)));
+            }
             _ => break,
         }
     }

@@ -26,7 +26,9 @@ pub fn tokenize(input: &str) -> Vec<Token> {
                     if p.is_numeric() {
                         n.push(*p);
                         chars.next();
-                    } else { break; }
+                    } else {
+                        break;
+                    }
                 }
                 tokens.push(Token::Number(n.parse().unwrap()));
             }
@@ -45,7 +47,9 @@ pub fn tokenize(input: &str) -> Vec<Token> {
                     if p.is_alphanumeric() || *p == '_' {
                         ident.push(*p);
                         chars.next();
-                    } else { break; }
+                    } else {
+                        break;
+                    }
                 }
                 match ident.as_str() {
                     "let" => tokens.push(Token::Let),
