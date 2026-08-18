@@ -1,6 +1,8 @@
 # zdos-zlang: Linguaggio di Sistema per ZDOS
 
-Questo repository contiene l'implementazione completa del linguaggio ZLang, una macchina virtuale (VM) a bytecode, la toolchain associata e le integrazioni con ZDOS e Discord. L'obiettivo è fornire un pacchetto completo per lo sviluppo di script, demoni e tool di orchestrazione nativi per il sistema operativo ZDOS.
+Questo repository contiene il progetto ZLang, una macchina virtuale (VM) a bytecode, la toolchain associata e le integrazioni previste con ZDOS e Discord. L'obiettivo è fornire un pacchetto completo per lo sviluppo di script, demoni e tool di orchestrazione nativi per il sistema operativo ZDOS.
+
+> **Stato di implementazione.** Il profilo oggi verificato per l’avvio nativo di ZDOS è **ZLB0 v1**: compila esclusivamente istruzioni `emit <testo>` nel tool `tools/zlangc.py` ed è eseguito dal prototipo bare-metal x86_64 in QEMU. Variabili, funzioni, moduli, syscall, package manager e le altre estensioni descritte in questo documento restano pianificate finché non saranno implementate e coperte da test. Istruzioni e contratto del profilo attivo sono disponibili in [docs/zdos-x86_64-profile.md](docs/zdos-x86_64-profile.md).
 
 ## Indice
 
