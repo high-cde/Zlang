@@ -1,35 +1,32 @@
-# Zlang — linguaggio applicativo nativo per ZDOS
+![Zlang — Native Runtime for ZDOS](https://capsule-render.vercel.app/api?type=waving&color=0:170b3a,40:7c3aed,72:2563eb,100:10b981&height=220&section=header&text=Zlang&fontSize=74&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Native%20bytecode%20runtime%20for%20ZDOS&descAlignY=60&descSize=20)
 
-[![Profilo](https://img.shields.io/badge/profilo-ZLB0%20v1-1f6feb?style=for-the-badge)](docs/zdos-x86_64-profile.md)
-[![Target](https://img.shields.io/badge/target-ZDOS%20x86__64-2ea043?style=for-the-badge)](https://github.com/high-cde/ZDOS/tree/main/os/x86_64)
-[![Boot](https://img.shields.io/badge/boot-QEMU%20verificato-d29922?style=for-the-badge)](https://github.com/high-cde/ZDOS/tree/main/os/x86_64)
-[![Licenza](https://img.shields.io/badge/licenza-da%20definire-6e7681?style=for-the-badge)](https://github.com/high-cde/Zlang)
+# Zlang · il linguaggio applicativo di ZDOS
 
-> **Zlang è il linguaggio applicativo del prototipo ZDOS x86_64.** Oggi il profilo verificato compila un programma `.zlang` in bytecode **ZLB0 v1**, lo incorpora nel kernel bare-metal e lo esegue durante il boot in QEMU. Il progetto cresce da questa base concreta: prima contratti piccoli, testabili e sicuri; poi nuove capacità.
+[![Validate Zlang](https://github.com/high-cde/Zlang/actions/workflows/validate.yml/badge.svg)](https://github.com/high-cde/Zlang/actions/workflows/validate.yml)
+[![Profilo](https://img.shields.io/badge/profilo-ZLB0%20v1-7c3aed?style=for-the-badge&logo=rust&logoColor=white)](docs/zdos-x86_64-profile.md)
+[![Target](https://img.shields.io/badge/target-ZDOS%20x86__64-2563eb?style=for-the-badge&logo=linux&logoColor=white)](https://github.com/high-cde/ZDOS/tree/main/os/x86_64)
+[![Boot](https://img.shields.io/badge/boot-QEMU%20verified-059669?style=for-the-badge&logo=qemu&logoColor=white)](https://github.com/high-cde/ZDOS/actions)
+[![Stato](https://img.shields.io/badge/stato-prototipo%20verificato-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/high-cde/Zlang)
+
+> **Zlang è un runtime bytecode nativo per il prototipo ZDOS x86_64.** Il percorso già dimostrato è concreto: un file `.zlang` diventa bytecode **ZLB0 v1**, viene incorporato in un kernel bare-metal e viene eseguito durante il boot in QEMU.
+
+## ⚡ In 30 secondi: dal sorgente al boot
 
 ![Pipeline Zlang → ZDOS](https://raw.githubusercontent.com/high-cde/ZDOS/main/os/x86_64/assets/zdos-zlang-pipeline.png)
 
-## 🚦 Stato reale, in una pagina
-
-| Area | Disponibile oggi | Non ancora disponibile |
+| Passaggio | Componente | Prova osservabile |
 |---|---|---|
-| Sintassi | `emit <testo>`, commenti `#`, righe vuote | Variabili, funzioni, moduli, tipi, controllo di flusso |
-| Compilazione | `tools/zlangc.py` genera bytecode ZLB0 v1 e header C | Compilatore ottimizzante, package manager, linker applicativo |
-| Runtime | Validazione di magic, versione, opcode, lunghezze e HALT | Heap, file system, rete, processi, eccezioni, scheduler |
-| Target | Kernel ZDOS bare-metal x86_64 in QEMU | Loader persistente, applicazioni esterne autonome, hardware fisico |
-| Verifica | Test Python, build freestanding, controllo Multiboot2 e smoke test QEMU | CI remota e matrice completa di regressione |
+| 📝 **Sorgente** | `programs/boot.zlang` | Istruzioni `emit <testo>` |
+| ⚙️ **Compilazione** | `tools/zlangc.py` | Bytecode ZLB0 v1 e header C |
+| 🧠 **Runtime** | `kernel/zlang.c` | Validazione di magic, versione, opcode e HALT |
+| 💿 **Sistema** | ZDOS bare-metal x86_64 | ELF Multiboot2 e immagine ISO GRUB |
+| 🖥️ **Verifica** | QEMU + seriale | `ZDOS: native Zlang program executed` |
 
-> **Regola di trasparenza:** non dichiarare una funzionalità “supportata” finché non ha contratto, implementazione, test negativo e prova ripetibile.
+> **Stato preciso:** Zlang non è ancora un linguaggio general purpose né ZDOS un sistema operativo generale. Variabili, funzioni, file system, rete, processi, driver, loader esterno e syscall pubbliche sono tappe future, non funzionalità già dichiarate.
 
-## 🧭 Perché Zlang esiste
+## 🚀 Avvio rapido
 
-Un sistema operativo non diventa affidabile aggiungendo soltanto funzioni. Diventa affidabile quando ogni passaggio tra sorgente, compilatore, runtime e macchina ha una responsabilità precisa. Zlang nasce per essere l’interfaccia applicativa di ZDOS: un linguaggio con un modello di esecuzione esplicito, un confine netto verso il kernel e una crescita controllata delle capacità.
-
-Il primo obiettivo non è simulare un sistema completo. È dimostrare un fatto fondamentale: **un programma scritto in Zlang può attraversare una toolchain propria, essere incluso in un’immagine bootabile e venire eseguito da un kernel ZDOS senza dipendere da Linux a runtime**.
-
-## ⚡ Avvio rapido — dalla sorgente al boot
-
-Clona entrambi i repository come directory affiancate. Il `Makefile` di ZDOS individua il compilatore Zlang in questa posizione.
+Clona Zlang e ZDOS come directory affiancate. Il build ZDOS individua il compilatore Zlang in questa posizione.
 
 ```sh
 git clone https://github.com/high-cde/Zlang.git
@@ -37,14 +34,11 @@ git clone https://github.com/high-cde/ZDOS.git
 
 cd ZDOS/os/x86_64
 make clean
-make all
 make verify
 sh tools/verify_qemu.sh
 ```
 
-Per il build completo sono richiesti `python3`, `gcc`, `binutils`, `make`, `grub-mkrescue`, `xorriso` e `qemu-system-x86_64`.
-
-La prova QEMU deve produrre esattamente il seguente percorso osservabile:
+L’esecuzione completa deve produrre questa sequenza seriale:
 
 ```text
 ZDOS x86_64 bootstrap
@@ -53,17 +47,19 @@ ZDOS: native Zlang program executed
 ZDOS: Zlang halted cleanly
 ```
 
-## ✍️ Il primo programma Zlang
+Per il build sono richiesti `python3`, `gcc`, `binutils`, `make`, `grub-mkrescue`, `xorriso` e `qemu-system-x86_64`.
 
-Il profilo ZLB0 v1 è intenzionalmente minimale. Ogni programma è composto da commenti oppure da istruzioni `emit`.
+## ✍️ Scrivi il primo programma
+
+Il profilo ZLB0 v1 è volutamente piccolo. Un programma usa commenti oppure l’istruzione `emit`.
 
 ```zlang
 # examples/hello.zlang
 emit Ciao dal programma Zlang nativo
-emit Questo testo verrà interpretato dal kernel ZDOS
+emit Il kernel ZDOS ha eseguito questo bytecode
 ```
 
-Il compilatore host produce due output: un file bytecode per l’ispezione e un header C da incorporare nel kernel.
+Compila l’esempio in bytecode e header C:
 
 ```sh
 python3 tools/zlangc.py examples/hello.zlang \
@@ -71,7 +67,7 @@ python3 tools/zlangc.py examples/hello.zlang \
   --header /tmp/hello.h
 ```
 
-Se la sintassi non appartiene ancora al profilo, il compilatore fallisce deliberatamente.
+Il compilatore rifiuta invece ciò che non appartiene ancora al profilo.
 
 ```zlang
 let risposta = 42
@@ -81,68 +77,76 @@ let risposta = 42
 zlangc: errore: ... sintassi non supportata; il profilo ZLB0 v1 accetta solo 'emit <testo>'
 ```
 
-Questo comportamento è una garanzia: un programma non viene interpretato “per caso” come qualcosa di diverso da ciò che lo sviluppatore ha chiesto.
+Questo rifiuto è una garanzia: il linguaggio non promette una capacità prima di avere contratto, implementazione e test.
+
+## 🧩 Cosa è supportato oggi
+
+| Area | ✅ Disponibile | ⏳ Prossimo, ma non ancora supportato |
+|---|---|---|
+| Sintassi | `emit <testo>`, commenti `#`, righe vuote | Variabili, funzioni, moduli, tipi, controllo di flusso |
+| Compilatore | `zlangc.py`, bytecode ZLB0 v1, header C | Ottimizzazioni, linker applicativo, package manager |
+| Runtime | Magic, versione, opcode, lunghezze e HALT validati | Heap, error handling avanzato, scheduler, eccezioni |
+| Sistema | Kernel ZDOS bare-metal x86_64 e QEMU | Loader persistente, app esterne, hardware fisico |
+| Verifica | Test Python, Multiboot2, boot seriale QEMU, CI | Matrice hardware e regressioni multi-target |
 
 ## 🧠 Il contratto ZLB0 v1
 
-Il bytecode è un piccolo protocollo tra compilatore e kernel. La semplicità serve a rendere ogni regola ispezionabile.
+Il bytecode è il patto esplicito tra compilatore e kernel. Ogni campo esiste per rendere il comportamento controllabile.
 
-| Campo | Valore | Ragione |
+| Campo | Valore | Perché conta |
 |---|---|---|
 | Magic | `ZLB0` | Riconosce il formato senza ambiguità |
-| Versione | `1` | Permette evoluzioni compatibili |
-| `0x01` | `EMIT` | Trasferisce testo UTF-8 alla console seriale |
-| `u16` little-endian | Lunghezza del payload | Evita letture oltre il buffer |
-| `0xff` | `HALT` | Rende la fine del programma deterministica |
+| Versione | `1` | Permette evoluzioni compatibili e rifiuti espliciti |
+| Opcode `0x01` | `EMIT` | Trasferisce testo UTF-8 alla console seriale |
+| `u16` little-endian | Lunghezza payload | Evita letture oltre il buffer |
+| Opcode `0xff` | `HALT` | Rende la terminazione deterministica |
 
-Il runtime nel kernel rifiuta magic, versione, opcode, lunghezza o terminazione non validi. Questa strategia **default-deny** è il seme della sicurezza futura: una capacità non definita non viene mai eseguita implicitamente.
+Il runtime rifiuta magic, versione, opcode, lunghezza e terminazione non validi. Questo modello **default-deny** è il primo confine di sicurezza: ciò che non è definito dal contratto non viene eseguito implicitamente.
 
-## 🔬 Dal concetto al sistema: i cinque livelli
+## 🔬 Cinque livelli, una catena leggibile
 
-| Livello | Domanda didattica | Risposta nel prototipo |
+| Livello | Domanda | Risposta nel prototipo |
 |---|---|---|
-| 1. Sorgente | Che cosa vuole fare il programma? | Dichiarare messaggi con `emit` |
-| 2. Compilatore | Come diventa una forma eseguibile? | `zlangc.py` genera ZLB0 v1 |
-| 3. Contratto | Come si evita l’ambiguità? | Magic, versione, opcode, lunghezze, HALT |
-| 4. Kernel | Chi possiede l’accesso alla macchina? | Kernel ZDOS, non il bytecode direttamente |
-| 5. Verifica | Come sappiamo che è successo davvero? | ISO, QEMU e output seriale obbligatorio |
+| 1. 📝 Sorgente | Cosa vuole fare il programma? | Dichiarare un messaggio con `emit` |
+| 2. ⚙️ Compilatore | Come diventa eseguibile? | `zlangc.py` genera ZLB0 v1 |
+| 3. 🧩 Contratto | Come si evita l’ambiguità? | Magic, versione, opcode, lunghezze e HALT |
+| 4. 🧠 Kernel | Chi può parlare con la macchina? | Il kernel ZDOS, non il bytecode direttamente |
+| 5. ✅ Verifica | Come sappiamo che funziona? | ISO, QEMU, output seriale e GitHub Actions |
 
-> Il bytecode non riceve accesso arbitrario a shell, rete, credenziali o file. Le future syscall dovranno essere capability esplicite, ristrette, auditate e disabilitate per default.
+> Il bytecode non riceve accesso diretto a shell, rete, credenziali o file. Ogni futura syscall dovrà essere una capability esplicita, limitata, auditabile e disabilitata per default.
 
-## 🛡️ Limiti di sicurezza e maturità
+## 🛡️ Confini attuali e direzione futura
 
-Il prototipo è un **nucleo avviabile**, non un sistema operativo generale. Non include ancora processi, isolamento di memoria, scheduler, filesystem, rete, driver, loader esterno, package manager o API di sistema pubbliche. Il programma Zlang viene incorporato nel kernel soltanto per dimostrare una catena nativa completa e verificabile.
+Il prototipo è un **nucleo avviabile**. L’assenza di processi, isolamento di memoria, filesystem, rete, driver, loader esterno e package manager non è nascosta: è un limite dichiarato. Prima di rendere una nuova capacità disponibile a Zlang, il progetto dovrà stabilire soggetto, capability, scope, allowlist, quota, timeout, evento di audit, errore e test negativo.
 
-Questi limiti non sono difetti nascosti: sono confini di progetto. Prima di esporre una nuova capacità a Zlang, il progetto dovrà definire soggetto, capability, scope, allowlist, quota, timeout, limite di risposta, evento di audit, modalità di errore e test negativi.
-
-## 🗺️ Roadmap ragionata
-
-| Soglia | Risultato richiesto | Evidenza minima |
+| Soglia | Nuova capacità | Evidenza richiesta prima di dichiararla supportata |
 |---|---|---|
-| **A — Contenitore esterno** | Caricare un file ZLB0 esterno in sola lettura | Parsing robusto, checksum e test di file malformato |
-| **B — Valori e memoria** | Aggiungere variabili e aritmetica con limiti | Test di overflow, errori runtime e risorse esaurite |
-| **C — Capability syscall** | Esporre log/tempo/input con policy default-deny | Allowlist, audit e test di capability negata |
-| **D — Programmi multipli** | Gestire esecuzioni isolate e cooperative | Scheduler minimo, limiti di tempo e regressioni QEMU |
-| **E — Distribuzione** | Rendere installabile il sistema su target definiti | Immagine firmata, release immutabile e documentazione di recupero |
+| **A — File ZLB0** | Caricare bytecode esterno in sola lettura | Parsing robusto, checksum e test di file malformato |
+| **B — Valori** | Variabili e aritmetica locale | Limiti, overflow ed errori runtime controllati |
+| **C — Capability** | Log, tempo o input con policy | Allowlist, audit, quota, timeout e test di diniego |
+| **D — Più programmi** | Esecuzioni cooperative | Scheduler minimo, limiti di tempo e regressioni QEMU |
+| **E — Distribuzione** | Target installabile | Immagine firmata, release immutabile e recupero documentato |
 
 ## 🧪 Verifica locale
 
-I test del compilatore si eseguono senza dipendenze esterne:
+Il contratto del compilatore è coperto da test senza dipendenze esterne:
 
 ```sh
 python3 -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
-Il controllo completo del prototipo coinvolge anche il kernel e QEMU. Le istruzioni sono raccolte nel [README di ZDOS x86_64](https://github.com/high-cde/ZDOS/tree/main/os/x86_64).
+Il workflow GitHub Actions esegue inoltre formattazione, build, Clippy e test Rust. La prova completa del sistema passa dal [README ZDOS x86_64](https://github.com/high-cde/ZDOS/tree/main/os/x86_64), dal [laboratorio teorico-pratico](https://github.com/high-cde/ZDOS/blob/main/os/x86_64/LEARNING_PATH.md) e dalla [validazione CI](https://github.com/high-cde/ZDOS/actions).
 
 ## 📚 Riferimenti
 
 [1] [Profilo tecnico ZLB0 v1](docs/zdos-x86_64-profile.md)
 [2] [Architettura ZDOS x86_64](https://github.com/high-cde/ZDOS/blob/main/os/x86_64/ARCHITECTURE.md)
-[3] [Guida operativa e build del prototipo](https://github.com/high-cde/ZDOS/tree/main/os/x86_64)
-[4] [Repository ZDOS](https://github.com/high-cde/ZDOS)
-[5] [Repository Zlang](https://github.com/high-cde/Zlang)
+[3] [Guida operativa ZDOS x86_64](https://github.com/high-cde/ZDOS/tree/main/os/x86_64)
+[4] [Laboratorio ZDOS x86_64 + Zlang](https://github.com/high-cde/ZDOS/blob/main/os/x86_64/LEARNING_PATH.md)
+[5] [Workflow di validazione Zlang](https://github.com/high-cde/Zlang/actions/workflows/validate.yml)
 
 ---
 
-**ZDOS + Zlang:** una base piccola, un contratto chiaro, una prova reale. Da qui si costruisce il resto. 🚀
+**Zlang + ZDOS** · _Build what you can prove._ ✨
+
+![Footer](https://capsule-render.vercel.app/api?type=waving&color=0:10b981,42:2563eb,100:7c3aed&height=120&section=footer)
