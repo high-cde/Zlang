@@ -1,0 +1,5 @@
+emit Inizializzazione sequenza di test ZDOS...
+SCAN_LEO_CONSTELLATION
+orbit_sync
+zchain 0x127fa7_TEST_PAYLOAD
+emit Missione completata. Spegnimento.

@@ -1,26 +1,37 @@
 use std::collections::HashMap;
-use crate::zpm;
 
 pub struct ZVirtualMachine {
     pub memory: HashMap<String, String>,
 }
 
+impl Default for ZVirtualMachine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ZVirtualMachine {
     pub fn new() -> Self {
-        ZVirtualMachine { memory: HashMap::new() }
+        ZVirtualMachine {
+            memory: HashMap::new(),
+        }
     }
 
-    pub fn execute(&mut self, bytecode: Vec<String>) {
-        println!("\n[Z-LANG VM 2026] Esecuzione Bytecode...");
-        for instruction in bytecode {
-            if instruction.starts_with("PRINT_STDOUT") {
-                println!("[Z-LANG OUTPUT] {}", &instruction[13..]);
-            } else if instruction == "SPACEX_LEO_HANDSHAKE" {
-                println!("[Z-LANG ORBITAL] Handshake LEO completato.");
-            } else if instruction.starts_with("ZCHAIN_SIGN") {
-                zpm::sign_transaction_zchain(&instruction[12..]);
+    pub fn execute(&mut self, bytecode: Vec<String>) -> String {
+        let mut output = String::new();
+        for instr in bytecode {
+            if let Some(stripped) = instr.strip_prefix("PRINT_STDOUT ") {
+                output.push_str(&format!("[ZLang VM] {}\n", stripped));
+            } else if let Some(stripped) = instr.strip_prefix("ZCHAIN_SIGN ") {
+                output.push_str(&format!("[Z-Chain Ledger] Firma payload: {}\n", stripped));
+            } else if instr == "SYSTEM_SCAN_ORBITAL" {
+                output.push_str("[LEO Tracker] Scansione costellazione attiva...\n");
+            } else if instr == "NET_SYNC_LEO" {
+                output.push_str("[Network] Gateway sincronizzato.\n");
+            } else {
+                output.push_str(&format!("[Errore VM] Istruzione non valida: {}\n", instr));
             }
         }
-        println!("[Z-LANG VM 2026] Esecuzione completata.");
+        output
     }
 }
