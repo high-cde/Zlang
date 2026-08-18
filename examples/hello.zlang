@@ -1,0 +1,3 @@
+# Esempio compatibile con il profilo ZLB0 v1.
+emit Ciao dal programma Zlang nativo
+emit Il kernel ZDOS ha eseguito questo bytecode
