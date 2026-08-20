@@ -137,6 +137,16 @@ python3 -m unittest discover -s tests -p 'test_*.py' -v
 
 Il workflow GitHub Actions esegue inoltre formattazione, build, Clippy e test Rust. La prova completa del sistema passa dal [README ZDOS x86_64](https://github.com/high-cde/ZDOS/tree/main/os/x86_64), dal [laboratorio teorico-pratico](https://github.com/high-cde/ZDOS/blob/main/os/x86_64/LEARNING_PATH.md) e dalla [validazione CI](https://github.com/high-cde/ZDOS/actions).
 
+## 🛰️ Ecosistema ZDOS
+
+| Componente | Ruolo | Collegamento |
+|---|---|---|
+| 🧠 ZDOS | Kernel, distro Linux e pipeline di boot | [Repository ZDOS](https://github.com/high-cde/ZDOS) |
+| 🛰️ ZDOS-SEC | HUD, feed, ledger locale e stream Socket.IO | [Repository ZDOS-SEC-PORTAL](https://github.com/high-cde/ZDOS-SEC-PORTAL) |
+| ⚙️ Zlang | Compilatore e contratto ZLB0 v1 | Questo repository |
+
+La guida di stile e la mappa dei contratti dell’ecosistema sono disponibili in [`docs/ECOSYSTEM.md`](https://github.com/high-cde/ZDOS/blob/main/docs/ECOSYSTEM.md) e [`docs/DOCUMENTATION_STYLE.md`](https://github.com/high-cde/ZDOS/blob/main/docs/DOCUMENTATION_STYLE.md).
+
 ## 📚 Riferimenti
 
 [1] [Profilo tecnico ZLB0 v1](docs/zdos-x86_64-profile.md)
