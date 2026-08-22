@@ -3,12 +3,12 @@
 # Zlang · il linguaggio applicativo di ZDOS
 
 [![Validate Zlang](https://github.com/high-cde/Zlang/actions/workflows/validate.yml/badge.svg)](https://github.com/high-cde/Zlang/actions/workflows/validate.yml)
-[![Profilo](https://img.shields.io/badge/profilo-ZLB0%20v1-7c3aed?style=for-the-badge&logo=rust&logoColor=white)](docs/zdos-x86_64-profile.md)
+[![Profilo](https://img.shields.io/badge/profilo-ZLB2%20v2.5-7c3aed?style=for-the-badge&logo=rust&logoColor=white)](docs/zdos-x86_64-profile.md)
 [![Target](https://img.shields.io/badge/target-ZDOS%20x86__64-2563eb?style=for-the-badge&logo=linux&logoColor=white)](https://github.com/high-cde/ZDOS/tree/main/os/x86_64)
 [![Boot](https://img.shields.io/badge/boot-QEMU%20verified-059669?style=for-the-badge&logo=qemu&logoColor=white)](https://github.com/high-cde/ZDOS/actions)
 [![Stato](https://img.shields.io/badge/stato-prototipo%20verificato-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/high-cde/Zlang)
 
-> **Zlang è un runtime bytecode nativo per il prototipo ZDOS x86_64.** Il percorso già dimostrato è concreto: un file `.zlang` diventa bytecode **ZLB0 v1**, viene incorporato in un kernel bare-metal e viene eseguito durante il boot in QEMU.
+> **Zlang è un runtime bytecode nativo per il prototipo ZDOS x86_64.** Il percorso già dimostrato è concreto: un file `.zlang` diventa bytecode **ZLB2 v2.5**, viene incorporato in un kernel bare-metal e viene eseguito durante il boot in QEMU.
 
 ## ⚡ In 30 secondi: dal sorgente al boot
 
@@ -17,7 +17,7 @@
 | Passaggio | Componente | Prova osservabile |
 |---|---|---|
 | 📝 **Sorgente** | `programs/boot.zlang` | Istruzioni `emit <testo>` |
-| ⚙️ **Compilazione** | `tools/zlangc.py` | Bytecode ZLB0 v1 e header C |
+| ⚙️ **Compilazione** | `tools/zlangc.py` | Bytecode ZLB2 v2.5 e header C |
 | 🧠 **Runtime** | `kernel/zlang.c` | Validazione di magic, versione, opcode e HALT |
 | 💿 **Sistema** | ZDOS bare-metal x86_64 | ELF Multiboot2 e immagine ISO GRUB |
 | 🖥️ **Verifica** | QEMU + seriale | `ZDOS: native Zlang program executed` |
@@ -42,7 +42,7 @@ L’esecuzione completa deve produrre questa sequenza seriale:
 
 ```text
 ZDOS x86_64 bootstrap
-Zlang runtime v1 ready
+Zlang runtime ZLB2 v2.5 ready
 ZDOS: native Zlang program executed
 ZDOS: Zlang halted cleanly
 ```
@@ -51,7 +51,7 @@ Per il build sono richiesti `python3`, `gcc`, `binutils`, `make`, `grub-mkrescue
 
 ## ✍️ Scrivi il primo programma
 
-Il profilo ZLB0 v1 è volutamente piccolo. Un programma usa commenti oppure l’istruzione `emit`.
+Il profilo ZLB2 v2.5 è volutamente piccolo. Un programma usa commenti oppure l’istruzione `emit`.
 
 ```zlang
 # examples/hello.zlang
@@ -74,7 +74,7 @@ let risposta = 42
 ```
 
 ```text
-zlangc: errore: ... sintassi non supportata; il profilo ZLB0 v1 accetta solo 'emit <testo>'
+zlangc: errore: ... sintassi non supportata; il profilo ZLB2 v2.5 accetta solo 'emit <testo>'
 ```
 
 Questo rifiuto è una garanzia: il linguaggio non promette una capacità prima di avere contratto, implementazione e test.
@@ -84,19 +84,19 @@ Questo rifiuto è una garanzia: il linguaggio non promette una capacità prima d
 | Area | ✅ Disponibile | ⏳ Prossimo, ma non ancora supportato |
 |---|---|---|
 | Sintassi | `emit <testo>`, commenti `#`, righe vuote | Variabili, funzioni, moduli, tipi, controllo di flusso |
-| Compilatore | `zlangc.py`, bytecode ZLB0 v1, header C | Ottimizzazioni, linker applicativo, package manager |
+| Compilatore | `zlangc.py`, bytecode ZLB2 v2.5, header C | Ottimizzazioni, linker applicativo, package manager |
 | Runtime | Magic, versione, opcode, lunghezze e HALT validati | Heap, error handling avanzato, scheduler, eccezioni |
 | Sistema | Kernel ZDOS bare-metal x86_64 e QEMU | Loader persistente, app esterne, hardware fisico |
 | Verifica | Test Python, Multiboot2, boot seriale QEMU, CI | Matrice hardware e regressioni multi-target |
 
-## 🧠 Il contratto ZLB0 v1
+## 🧠 Il contratto ZLB2 v2.5
 
 Il bytecode è il patto esplicito tra compilatore e kernel. Ogni campo esiste per rendere il comportamento controllabile.
 
 | Campo | Valore | Perché conta |
 |---|---|---|
-| Magic | `ZLB0` | Riconosce il formato senza ambiguità |
-| Versione | `1` | Permette evoluzioni compatibili e rifiuti espliciti |
+| Magic | `ZLB2` | Riconosce il formato senza ambiguità |
+| Versione | `2.5` | Permette evoluzioni compatibili e rifiuti espliciti |
 | Opcode `0x01` | `EMIT` | Trasferisce testo UTF-8 alla console seriale |
 | `u16` little-endian | Lunghezza payload | Evita letture oltre il buffer |
 | Opcode `0xff` | `HALT` | Rende la terminazione deterministica |
@@ -108,7 +108,7 @@ Il runtime rifiuta magic, versione, opcode, lunghezza e terminazione non validi.
 | Livello | Domanda | Risposta nel prototipo |
 |---|---|---|
 | 1. 📝 Sorgente | Cosa vuole fare il programma? | Dichiarare un messaggio con `emit` |
-| 2. ⚙️ Compilatore | Come diventa eseguibile? | `zlangc.py` genera ZLB0 v1 |
+| 2. ⚙️ Compilatore | Come diventa eseguibile? | `zlangc.py` genera ZLB2 v2.5 |
 | 3. 🧩 Contratto | Come si evita l’ambiguità? | Magic, versione, opcode, lunghezze e HALT |
 | 4. 🧠 Kernel | Chi può parlare con la macchina? | Il kernel ZDOS, non il bytecode direttamente |
 | 5. ✅ Verifica | Come sappiamo che funziona? | ISO, QEMU, output seriale e GitHub Actions |
@@ -121,7 +121,7 @@ Il prototipo è un **nucleo avviabile**. L’assenza di processi, isolamento di 
 
 | Soglia | Nuova capacità | Evidenza richiesta prima di dichiararla supportata |
 |---|---|---|
-| **A — File ZLB0** | Caricare bytecode esterno in sola lettura | Parsing robusto, checksum e test di file malformato |
+| **A — File ZLB2** | Caricare bytecode esterno in sola lettura | Parsing robusto, checksum e test di file malformato |
 | **B — Valori** | Variabili e aritmetica locale | Limiti, overflow ed errori runtime controllati |
 | **C — Capability** | Log, tempo o input con policy | Allowlist, audit, quota, timeout e test di diniego |
 | **D — Più programmi** | Esecuzioni cooperative | Scheduler minimo, limiti di tempo e regressioni QEMU |
@@ -143,13 +143,15 @@ Il workflow GitHub Actions esegue inoltre formattazione, build, Clippy e test Ru
 |---|---|---|
 | 🧠 ZDOS | Kernel, distro Linux e pipeline di boot | [Repository ZDOS](https://github.com/high-cde/ZDOS) |
 | 🛰️ ZDOS-SEC | HUD, feed, ledger locale e stream Socket.IO | [Repository ZDOS-SEC-PORTAL](https://github.com/high-cde/ZDOS-SEC-PORTAL) |
-| ⚙️ Zlang | Compilatore e contratto ZLB0 v1 | Questo repository |
+| ⚙️ **Zlang** | Compilatore e contratto ZLB2 v2.5 | Questo repository |
 
 La guida di stile e la mappa dei contratti dell’ecosistema sono disponibili in [`docs/ECOSYSTEM.md`](https://github.com/high-cde/ZDOS/blob/main/docs/ECOSYSTEM.md) e [`docs/DOCUMENTATION_STYLE.md`](https://github.com/high-cde/ZDOS/blob/main/docs/DOCUMENTATION_STYLE.md).
 
 ## 📚 Riferimenti
 
-[1] [Profilo tecnico ZLB0 v1](docs/zdos-x86_64-profile.md)
+[1] [Profilo tecnico ZLB2 v2.5](docs/zdos-x86_64-profile.md)
+[6] [Documento completo Zlang by ZDOS](docs/ZLANG_BY_ZDOS.md)
+[7] [ZDOS Evidence Chain](https://github.com/high-cde/ZDOS/tree/main/evidence)
 [2] [Architettura ZDOS x86_64](https://github.com/high-cde/ZDOS/blob/main/os/x86_64/ARCHITECTURE.md)
 [3] [Guida operativa ZDOS x86_64](https://github.com/high-cde/ZDOS/tree/main/os/x86_64)
 [4] [Laboratorio ZDOS x86_64 + Zlang](https://github.com/high-cde/ZDOS/blob/main/os/x86_64/LEARNING_PATH.md)

@@ -1,6 +1,6 @@
-# Profilo Zlang ZLB0 v1 per ZDOS x86_64
+# Profilo Zlang ZLB2 v2.5 per ZDOS x86_64
 
-Il compilatore `tools/zlangc.py` implementa il profilo iniziale di bytecode **ZLB0 v1**. Il suo obiettivo non è sostituire la futura toolchain Zlang completa: fornisce un contratto piccolo, eseguibile e verificato per il primo prototipo ZDOS avviabile in QEMU.
+Il compilatore `tools/zlangc.py` implementa il profilo iniziale di bytecode **ZLB2 v2.5**. Il suo obiettivo non è sostituire la futura toolchain Zlang completa: fornisce un contratto piccolo, eseguibile e verificato per il primo prototipo ZDOS avviabile in QEMU.
 
 ## Utilizzo
 
@@ -22,12 +22,12 @@ emit Messaggio da stampare sulla console seriale
 
 Commenti introdotti da `#` e righe vuote sono consentiti. Variabili, funzioni, moduli, filesystem, rete, processi e syscall non appartengono ancora a questo profilo; la loro sintassi viene rifiutata dal compilatore.
 
-## Formato ZLB0 v1
+## Formato ZLB2 v2.5
 
 | Campo | Valore |
 |---|---|
-| Magic | `ZLB0` |
-| Versione | `1` |
+| Magic | `ZLB2` |
+| Versione | `2.5` |
 | Opcode `0x01` | `EMIT`, seguito da `u16` little-endian e payload UTF-8 |
 | Opcode `0xff` | `HALT` |
 
