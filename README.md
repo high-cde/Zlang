@@ -127,6 +127,12 @@ Il prototipo è un **nucleo avviabile**. L’assenza di processi, isolamento di 
 | **D — Più programmi** | Esecuzioni cooperative | Scheduler minimo, limiti di tempo e regressioni QEMU |
 | **E — Distribuzione** | Target installabile | Immagine firmata, release immutabile e recupero documentato |
 
+## 🔁 Pipeline CI/CD ZLB2
+
+Ogni modifica al compilatore passa prima dal contratto ZLB2: i test Python generano bytecode e header, verificano magic e versione `2.5`, controllano record e `HALT`, quindi eseguono i controlli Rust. Il workflow usa il nome **Test ZLB2 compiler contract** e deve restare verde prima di integrare il compilatore con ZDOS.
+
+La verifica end-to-end del sistema viene completata nel [workflow ZDOS x86_64](https://github.com/high-cde/ZDOS/blob/main/.github/workflows/validate-x86_64.yml), che ricompila il kernel, valida l’header generato, crea l’ISO e avvia QEMU. Una release non deve essere attestata finché compiler, contratto, kernel e boot non hanno superato i rispettivi gate.
+
 ## 🧪 Verifica locale
 
 Il contratto del compilatore è coperto da test senza dipendenze esterne:

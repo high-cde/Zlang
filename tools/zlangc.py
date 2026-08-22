@@ -1,5 +1,5 @@
-import sys
 import argparse
+import sys
 
 def compile_source(source_path, bytecode_path, header_path):
     with open(source_path, 'r') as f:

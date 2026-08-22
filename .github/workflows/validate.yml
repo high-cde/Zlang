@@ -26,7 +26,7 @@ jobs:
         with:
           components: rustfmt, clippy
 
-      - name: Test ZLB0 compiler contract
+      - name: Test ZLB2 compiler contract
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
 
       - name: Check Rust formatting
