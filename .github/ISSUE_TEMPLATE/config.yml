@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Domande e supporto
+    url: https://github.com/high-cde
+    about: Consultare SUPPORT.md e usare le discussioni del progetto per richieste non riconducibili a un bug o a una proposta.
+  - name: Segnalazioni di sicurezza
+    url: https://github.com/high-cde
+    about: Non pubblicare vulnerabilità o dati sensibili in una issue pubblica; seguire SECURITY.md quando disponibile.
