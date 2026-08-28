@@ -56,6 +56,17 @@ def compile_source(source_path, bytecode_path, header_path):
             bytecode.extend(len(payload).to_bytes(2, byteorder='little'))
             bytecode.extend(payload)
             instructions_compiled += 1
+
+        elif line.startswith('storage.read '):
+            path = line[len('storage.read '):].strip().strip('"\'')
+            if not path or path.startswith('/') or '\\x00' in path or any(part == '..' for part in path.split('/')):
+                print(f"zlangc v2.5 error: storage path fuori namespace -> '{path}'")
+                sys.exit(1)
+            payload = path.encode('utf-8')
+            bytecode.append(0x06) # STORAGE READ capability
+            bytecode.extend(len(payload).to_bytes(2, byteorder='little'))
+            bytecode.extend(payload)
+            instructions_compiled += 1
         else:
             print(f"zlangc v2.5 error: sintassi sconosciuta -> '{line}'")
             sys.exit(1)

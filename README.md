@@ -22,7 +22,7 @@ Zlang definisce il linguaggio sorgente, il compilatore e il contratto bytecode u
 | **Sistema** | ZDOS bare-metal x86_64 | ELF Multiboot2 e ISO GRUB |
 | **Verifica** | QEMU, seriale e GitHub Actions | Output di boot riproducibile |
 
-**Stato attuale:** Zlang non è ancora un linguaggio general-purpose e ZDOS non è ancora un sistema operativo general-purpose. Variabili, funzioni, filesystem, rete, processi, driver, loader esterno e syscall pubbliche sono attività future, non funzionalità già supportate.
+**Stato attuale:** Zlang non è ancora un linguaggio general-purpose e ZDOS non è ancora un sistema operativo general-purpose. Variabili, funzioni, filesystem nativo, rete, processi, driver, loader esterno e syscall pubbliche sono ancora limitati o futuri. La capability Linux confinata `storage.read-v1` è disponibile separatamente tramite bridge read-only.
 
 ## Avvio rapido
 
@@ -51,7 +51,7 @@ Per la build sono richiesti `python3`, `gcc`, `binutils`, `make`, `grub-mkrescue
 
 ## Scrivere il primo programma
 
-Il profilo ZLB2 v2.5 è volutamente minimale. Un programma può contenere commenti, righe vuote e istruzioni `emit`:
+Il profilo ZLB2 v2.5 è volutamente minimale. Un programma può contenere commenti, righe vuote, istruzioni `emit` e il record capability `storage.read`:
 
 ```zlang
 # examples/hello.zlang
@@ -73,8 +73,10 @@ Il compilatore rifiuta ciò che non appartiene ancora al profilo:
 let risposta = 42
 ```
 
+La capability `storage.read` è valida soltanto con un path relativo al namespace autorizzato e viene eseguita nel percorso Linux dal bridge documentato più avanti.
+
 ```text
-zlangc: errore: ... sintassi non supportata; il profilo ZLB2 v2.5 accetta solo 'emit <testo>'
+zlangc v2.5 error: sintassi sconosciuta; il profilo rifiuta istruzioni non definite dal contratto
 ```
 
 Questo comportamento mantiene allineati linguaggio, contratto, runtime e documentazione.
@@ -83,7 +85,7 @@ Questo comportamento mantiene allineati linguaggio, contratto, runtime e documen
 
 | Area | Supportato oggi | Non ancora supportato |
 |---|---|---|
-| **Sintassi** | `emit <testo>`, commenti `#`, righe vuote | Variabili, funzioni, moduli, tipi e controllo di flusso |
+| **Sintassi** | `emit <testo>`, `storage.read "path"`, commenti `#`, righe vuote | Funzioni, moduli, tipi e controllo di flusso |
 | **Compilatore** | `zlangc.py`, bytecode ZLB2 v2.5 e header C | Ottimizzazioni, linker applicativo e package manager |
 | **Runtime** | Magic, versione, opcode, lunghezze e `HALT` validati | Heap, gestione avanzata degli errori, scheduler ed eccezioni |
 | **Sistema** | Kernel ZDOS bare-metal x86_64 e QEMU | Loader persistente, applicazioni esterne e hardware fisico |
@@ -97,7 +99,7 @@ Il bytecode è il contratto esplicito tra compilatore e runtime. Ogni campo ha u
 |---|---|---|
 | **Magic** | `ZLB2` | Identifica il formato senza ambiguità |
 | **Versione** | `2.5` | Consente evoluzione e rifiuti espliciti |
-| **Opcode** | `0x01` — `EMIT` | Invia testo UTF-8 alla console seriale |
+| **Opcode** | `0x01` — `EMIT`; `0x06` — `STORAGE_READ` | Console seriale; richiesta read-only confinata al bridge Linux |
 | **Lunghezza** | `u16` little-endian | Impedisce letture oltre il buffer |
 | **Terminazione** | `0xff` — `HALT` | Rende deterministica la fine del programma |
 
@@ -109,7 +111,7 @@ Il riferimento tecnico completo è il [profilo ZLB2 v2.5](docs/zdos-x86_64-profi
 
 | Livello | Domanda | Risposta nel prototipo |
 |---|---|---|
-| **1. Sorgente** | Cosa descrive il programma? | Un messaggio tramite `emit` |
+| **1. Sorgente** | Cosa descrive il programma? | Un messaggio o una richiesta `storage.read` |
 | **2. Compilatore** | Come diventa bytecode? | `zlangc.py` genera ZLB2 v2.5 |
 | **3. Contratto** | Come si evita l’ambiguità? | Magic, versione, opcode, lunghezze e `HALT` |
 | **4. Kernel** | Chi controlla l’esecuzione? | Il runtime del kernel ZDOS |
@@ -125,7 +127,7 @@ Prima di dichiarare supportata una nuova capacità, il progetto richiede contrat
 |---|---|---|
 | **A — File ZLB2** | Caricamento di bytecode esterno in sola lettura | Parsing robusto, checksum e test di file malformato |
 | **B — Valori** | Variabili e aritmetica locale | Limiti, overflow ed errori runtime controllati |
-| **C — Capability** | Log, tempo o input con policy | Allowlist, audit, quota, timeout e test di diniego |
+| **C — Capability** | `storage.read-v1` read-only con namespace | Allowlist, isolamento, quota, audit e test di diniego |
 | **D — Più programmi** | Esecuzioni cooperative | Scheduler minimo, limiti di tempo e regressioni QEMU |
 | **E — Distribuzione** | Target installabile | Immagine firmata, release immutabile e recupero documentato |
 
@@ -148,6 +150,8 @@ GitHub Actions esegue inoltre formattazione, build, Clippy e test Rust. La verif
 | **ZDOS-SEC** | HUD, feed, ledger locale e stream Socket.IO | [Repository ZDOS-SEC-PORTAL](https://github.com/high-cde/ZDOS-SEC-PORTAL) |
 
 La mappa dei contratti e le convenzioni documentali dell’ecosistema sono disponibili in [`docs/ECOSYSTEM.md`](https://github.com/high-cde/ZDOS/blob/main/docs/ECOSYSTEM.md) e [`docs/DOCUMENTATION_STYLE.md`](https://github.com/high-cde/ZDOS/blob/main/docs/DOCUMENTATION_STYLE.md).
+
+La pipeline evolutiva completa è orchestrata dal repository ZDOS tramite [`scripts/evolve-zlang-evidence.sh`](https://github.com/high-cde/ZDOS/blob/main/scripts/evolve-zlang-evidence.sh). Il comando collega il sorgente Zlang, il bytecode ZLB2, il kernel ZDOS, il boot QEMU e una registrazione append-only nella Evidence Chain. L’attestazione contiene hash degli artefatti e commit dei repository; non implica networking, consenso distribuito o esecuzione remota.
 
 ## Documentazione
 
@@ -182,3 +186,34 @@ Questo progetto è distribuito secondo la licenza indicata in [`LICENSE`](LICENS
 ---
 
 **Zlang · ZDOS** — *Build what you can prove.*
+
+
+## storage.read-v1: capability read-only
+
+Zlang v2.5 supporta il record ZLB2 `0x06` tramite la sintassi:
+
+```zlang
+storage.read ".zdos-persistence-marker"
+```
+
+Il percorso è relativo al namespace autorizzato. Path assoluti, `..`, NUL byte e accesso a `/dev` vengono rifiutati.
+
+Nel percorso Linux verificato da ZDOS, la lettura reale avviene tramite il bridge confinato:
+
+```sh
+python3 tools/zlang_storage_read.py program.zlang \
+  --root /mnt/data \
+  --max-bytes 4096
+```
+
+Il bridge è read-only, applica un limite di dimensione, risolve il path dentro `/mnt/data` e restituisce `ZLANG_STORAGE_READ_OK` con path relativo, dimensione e hash del contenuto. La scrittura non è supportata.
+
+Il runtime bare-metal ZDOS riconosce e valida l’opcode `storage.read`, ma dichiara esplicitamente che la capability richiede il bridge Linux finché il filesystem nativo del kernel non sarà disponibile. Non è accesso raw al disco e non implica che il target bare-metal possieda già un filesystem.
+
+Verifica locale:
+
+```sh
+python3 tests/test_storage_read_v1.py
+```
+
+Questa milestone dimostra il contratto Zlang e la lettura confinata nel percorso Linux; non abilita syscall universali, accesso al filesystem host fuori dal namespace o scrittura persistente.
