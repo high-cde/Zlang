@@ -173,7 +173,7 @@ La guida di stile e la mappa dei contratti dell’ecosistema sono disponibili in
 
 | Risorsa | Scopo |
 |---|---|
-| [Wiki](https://github.com/high-cde/Zlang/wiki) | Architettura, operazioni, roadmap e release. |
+| [Documentazione di progetto](docs/wiki/Home.md) | Architettura, operazioni, roadmap e release, versionate insieme al codice. |
 | [Changelog](CHANGELOG.md) | Modifiche rilevanti e baseline di rilascio. |
 | [Contribuire](CONTRIBUTING.md) | Flusso di lavoro e verifiche per i contributi. |
 | [Sicurezza](SECURITY.md) | Segnalazione responsabile e limiti operativi. |
