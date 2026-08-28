@@ -1,4 +1,4 @@
-pub fn sign_transaction_zchain(payload: &str) {
-    println!("[Z-CHAIN] ⛓️ Firma transazione in corso per: {}", payload);
-    println!("[Z-CHAIN] ✅ Transazione inserita nel Blocco Genesis.");
+/// La firma e la persistenza su una chain esterna non sono implementate.
+pub fn sign_transaction_zchain(_payload: &str) -> Result<(), &'static str> {
+    Err("zchain esterna non implementata: nessuna firma o scrittura è stata eseguita")
 }

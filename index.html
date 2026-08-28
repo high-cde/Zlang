@@ -135,20 +135,9 @@
       </div>
     </div>
     
-    <div class="terminal-box">
-      <div class="terminal-header">
-        <div class="dot dot-red"></div>
-        <div class="dot dot-yellow"></div>
-        <div class="dot dot-green"></div>
-        <span class="terminal-title">zdos-ci // boot-verification.py</span>
-      </div>
-      <div class="terminal-body">
-        <span class="t-step">📝 Zlang:</span> emit "ZDOS Kernel Active"<br>
-        <span class="t-step">⚙️ Bytecode:</span> zlangc.py -> ZLB2 v2.5<br>
-        <span class="t-step">🧠 Kernel:</span> loaded bare-metal x86_64<br>
-        <span class="t-step">💿 Boot:</span> GRUB ISO compiled<br>
-        <span class="t-val">✨ Status: QEMU serial verified OK.</span>
-      </div>
+    <div class="status-box" style="margin-top:0">
+      <h4>PROVA RIPRODUCIBILE</h4>
+      <p>La catena reale è nel codice e nella CI: il compilatore genera bytecode ZLB2, ZDOS lo incorpora e il workflow verifica il boot seriale in QEMU. Per riprodurla, seguire <a href="docs/zdos-x86_64-profile.md">il profilo ZDOS x86_64</a> e il workflow pubblico del repository.</p>
     </div>
   </header>
 

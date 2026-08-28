@@ -23,12 +23,11 @@ impl Compiler {
             }
             if let Some(stripped) = line.strip_prefix("emit ") {
                 self.instructions.push(format!("PRINT_STDOUT {}", stripped));
-            } else if let Some(stripped) = line.strip_prefix("zchain ") {
-                self.instructions.push(format!("ZCHAIN_SIGN {}", stripped));
-            } else if line == "SCAN_LEO_CONSTELLATION" {
-                self.instructions.push("SYSTEM_SCAN_ORBITAL".to_string());
-            } else if line == "orbit_sync" {
-                self.instructions.push("NET_SYNC_LEO".to_string());
+            } else if line.strip_prefix("zchain ").is_some()
+                || line == "SCAN_LEO_CONSTELLATION"
+                || line == "orbit_sync"
+            {
+                self.instructions.push(format!("UNIMPLEMENTED_EXTERNAL_OPERATION {}", line));
             } else {
                 self.instructions.push(format!("UNKNOWN_OPCODE {}", line));
             }

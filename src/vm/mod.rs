@@ -22,12 +22,8 @@ impl ZVirtualMachine {
         for instr in bytecode {
             if let Some(stripped) = instr.strip_prefix("PRINT_STDOUT ") {
                 output.push_str(&format!("[ZLang VM] {}\n", stripped));
-            } else if let Some(stripped) = instr.strip_prefix("ZCHAIN_SIGN ") {
-                output.push_str(&format!("[Z-Chain Ledger] Firma payload: {}\n", stripped));
-            } else if instr == "SYSTEM_SCAN_ORBITAL" {
-                output.push_str("[LEO Tracker] Scansione costellazione attiva...\n");
-            } else if instr == "NET_SYNC_LEO" {
-                output.push_str("[Network] Gateway sincronizzato.\n");
+            } else if instr.starts_with("UNIMPLEMENTED_EXTERNAL_OPERATION ") {
+                output.push_str(&format!("[Errore VM] Operazione esterna non implementata: {}\n", instr));
             } else {
                 output.push_str(&format!("[Errore VM] Istruzione non valida: {}\n", instr));
             }
