@@ -27,7 +27,8 @@ impl Compiler {
                 || line == "SCAN_LEO_CONSTELLATION"
                 || line == "orbit_sync"
             {
-                self.instructions.push(format!("UNIMPLEMENTED_EXTERNAL_OPERATION {}", line));
+                self.instructions
+                    .push(format!("UNIMPLEMENTED_EXTERNAL_OPERATION {}", line));
             } else {
                 self.instructions.push(format!("UNKNOWN_OPCODE {}", line));
             }
