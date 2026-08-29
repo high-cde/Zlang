@@ -143,6 +143,8 @@ GitHub Actions esegue inoltre formattazione, build, Clippy e test Rust. La verif
 
 ## Ecosistema ZDOS
 
+La guida coordinata [ZDOS–Zlang–ZRetro](docs/ZDOS_ZRETRO_BRIDGE.md) documenta il rapporto tra sorgente, bytecode, runtime e IDE retro. Il tasto **ZRetro** conduce alla pagina pubblica [Retro Computing](https://zdos-hub.it/retro-computing.html).
+
 | Componente | Ruolo | Collegamento |
 |---|---|---|
 | **ZDOS** | Kernel, distribuzione Linux e pipeline di boot | [Repository ZDOS](https://github.com/high-cde/ZDOS) |
