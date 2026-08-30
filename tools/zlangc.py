@@ -1,95 +1,130 @@
+#!/usr/bin/env python3
+"""Compile the supported Zlang source profile into ZLB2 v2.5 bytecode.
+
+The compiler deliberately exposes only instructions with a defined execution
+contract. The ``zdos-x86_64`` target is bootstrap-safe and currently supports
+``emit`` only; ``linux-bridge`` additionally supports the confined
+``storage.read`` capability.
+"""
+from __future__ import annotations
+
 import argparse
 import sys
+from pathlib import Path
 
-def compile_source(source_path, bytecode_path, header_path):
-    with open(source_path, 'r') as f:
-        lines = f.readlines()
+ZLB2_HEADER = b"ZLB2\x02\x05"
+ZLB2_HALT = 0xFF
+ZLB2_EMIT = 0x01
+ZLB2_STORAGE_READ = 0x06
+MAX_RECORD_PAYLOAD = 0xFFFF
+TARGETS = ("linux-bridge", "zdos-x86_64")
 
-    bytecode = bytearray()
-    bytecode.extend(b'ZLB2') # Magic v2.0+
-    bytecode.extend(b'\x02\x05') # Versione 2.5 (Aritmetica attiva)
 
+class CompileError(ValueError):
+    """Raised when source is outside the selected Zlang capability profile."""
+
+
+def _record(opcode: int, payload: bytes) -> bytes:
+    if len(payload) > MAX_RECORD_PAYLOAD:
+        raise CompileError(
+            f"payload oltre il limite di {MAX_RECORD_PAYLOAD} byte per il record ZLB2"
+        )
+    return bytes((opcode,)) + len(payload).to_bytes(2, byteorder="little") + payload
+
+
+def _storage_path(raw_path: str, line_no: int) -> bytes:
+    path = raw_path.strip().strip('"\'')
+    parts = path.split("/")
+    if not path or path.startswith("/") or "\x00" in path or any(part == ".." for part in parts):
+        raise CompileError(f"riga {line_no}: storage.read path fuori namespace")
+    return path.encode("utf-8")
+
+
+def compile_source(
+    source_path: str | Path,
+    bytecode_path: str | Path,
+    header_path: str | Path,
+    *,
+    target: str = "linux-bridge",
+) -> tuple[int, int]:
+    """Compile source and return the bytecode size and instruction count.
+
+    The function is intentionally side-effect limited to the two declared
+    output paths and raises :class:`CompileError` instead of exiting the host
+    process, so callers can handle errors deterministically.
+    """
+    if target not in TARGETS:
+        raise CompileError(f"target non supportato: {target}")
+
+    source_file = Path(source_path)
+    bytecode_file = Path(bytecode_path)
+    header_file = Path(header_path)
+    lines = source_file.read_text(encoding="utf-8").splitlines()
+    bytecode = bytearray(ZLB2_HEADER)
     instructions_compiled = 0
 
-    for line in lines:
-        line = line.strip()
-        if not line or line.startswith('#'):
+    for line_no, raw_line in enumerate(lines, 1):
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
             continue
-        
-        if line.startswith('emit '):
-            text = line[5:].strip().strip('"\'')
-            payload = text.encode('utf-8')
-            bytecode.append(0x01) # EMIT
-            bytecode.extend(len(payload).to_bytes(2, byteorder='little'))
-            bytecode.extend(payload)
-            instructions_compiled += 1
-            
-        elif line.startswith('let '):
-            # Sintassi supportate:
-            # let x = 100
-            # let result = 50 + 25
-            content = line[4:].strip()
-            payload = content.encode('utf-8')
-            bytecode.append(0x02) # VIRTUAL RAM / ALU ASSIGN
-            bytecode.extend(len(payload).to_bytes(2, byteorder='little'))
-            bytecode.extend(payload)
-            instructions_compiled += 1
 
-        elif line.startswith('if '):
-            # Sintassi: if x == 100 jump label
-            payload = line[3:].encode('utf-8')
-            bytecode.append(0x03) # CONDITIONAL JUMP
-            bytecode.extend(len(payload).to_bytes(2, byteorder='little'))
-            bytecode.extend(payload)
-            instructions_compiled += 1
-
-        elif line.endswith(':'):
-            label_name = line[:-1].encode('utf-8')
-            bytecode.append(0x04) # LABEL MARKER
-            bytecode.extend(len(label_name).to_bytes(2, byteorder='little'))
-            bytecode.extend(label_name)
-            instructions_compiled += 1
-
-        elif line.startswith('wait'):
-            payload = b'async_signal'
-            bytecode.append(0x05) # ASYNC INTERRUPT
-            bytecode.extend(len(payload).to_bytes(2, byteorder='little'))
-            bytecode.extend(payload)
-            instructions_compiled += 1
-
-        elif line.startswith('storage.read '):
-            path = line[len('storage.read '):].strip().strip('"\'')
-            if not path or path.startswith('/') or '\\x00' in path or any(part == '..' for part in path.split('/')):
-                print(f"zlangc v2.5 error: storage path fuori namespace -> '{path}'")
-                sys.exit(1)
-            payload = path.encode('utf-8')
-            bytecode.append(0x06) # STORAGE READ capability
-            bytecode.extend(len(payload).to_bytes(2, byteorder='little'))
-            bytecode.extend(payload)
-            instructions_compiled += 1
+        if line.startswith("emit "):
+            payload = line[5:].strip().strip('"\'').encode("utf-8")
+            bytecode.extend(_record(ZLB2_EMIT, payload))
+        elif line.startswith("storage.read "):
+            if target != "linux-bridge":
+                raise CompileError(
+                    f"riga {line_no}: storage.read richiede il target linux-bridge; "
+                    "non è eseguibile nel bootstrap zdos-x86_64"
+                )
+            bytecode.extend(_record(ZLB2_STORAGE_READ, _storage_path(line[len("storage.read "):], line_no)))
         else:
-            print(f"zlangc v2.5 error: sintassi sconosciuta -> '{line}'")
-            sys.exit(1)
+            raise CompileError(
+                f"riga {line_no}: sintassi non supportata dal profilo {target}: {line!r}"
+            )
+        instructions_compiled += 1
 
-    bytecode.append(0xff) # HALT
-    bytecode.extend((0).to_bytes(2, byteorder='little'))
+    bytecode.extend(_record(ZLB2_HALT, b""))
+    bytecode_file.parent.mkdir(parents=True, exist_ok=True)
+    header_file.parent.mkdir(parents=True, exist_ok=True)
+    bytecode_file.write_bytes(bytecode)
 
-    with open(bytecode_path, 'wb') as f:
-        f.write(bytecode)
+    encoded_bytes = ", ".join(f"0x{byte:02x}" for byte in bytecode)
+    header_file.write_text(
+        "/* Generated by Zlang ZLB2 v2.5 compiler; do not edit. */\n"
+        "#ifndef ZLANG_PROGRAM_H\n"
+        "#define ZLANG_PROGRAM_H\n\n"
+        f"static const unsigned char zlang_bytecode[] = {{\n    {encoded_bytes}\n}};\n"
+        f"static const unsigned long zlang_bytecode_size = {len(bytecode)}UL;\n\n"
+        "#endif\n",
+        encoding="utf-8",
+    )
+    return len(bytecode), instructions_compiled
 
-    with open(header_path, 'w') as f:
-        f.write("/* Z-LANG V2.5 ALU HEADER */\n")
-        f.write("#ifndef ZLANG_PROGRAM_H\n#define ZLANG_PROGRAM_H\n\n")
-        f.write(f"static const unsigned char zlang_bytecode[] = {{\n    ")
-        f.write(", ".join(hex(b) for b in bytecode))
-        f.write("\n};\n\n#endif\n")
 
-    print(f"zlangc v2.5: compilato {source_path} ({len(bytecode)} byte, {instructions_compiled} istruzioni)")
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Z-Lang Compiler v2.5')
-    parser.add_argument('source', help='Sorgente .zlang')
-    parser.add_argument('--bytecode', required=True)
-    parser.add_argument('--header', required=True)
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Zlang compiler for ZLB2 v2.5")
+    parser.add_argument("source", help="sorgente .zlang")
+    parser.add_argument("--bytecode", required=True, help="percorso del bytecode ZLB2 generato")
+    parser.add_argument("--header", required=True, help="percorso dell'header C generato")
+    parser.add_argument(
+        "--target",
+        choices=TARGETS,
+        default="linux-bridge",
+        help="profilo di execution target (default: linux-bridge)",
+    )
     args = parser.parse_args()
-    compile_source(args.source, args.bytecode, args.header)
+    try:
+        size, count = compile_source(args.source, args.bytecode, args.header, target=args.target)
+    except (OSError, CompileError) as exc:
+        print(f"zlangc v2.5 error: {exc}", file=sys.stderr)
+        return 1
+    print(
+        f"zlangc v2.5: compilato {args.source} ({size} byte, {count} istruzioni, "
+        f"target={args.target})"
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

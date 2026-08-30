@@ -5,34 +5,35 @@ use zdos_zlang::{Compiler, ZVirtualMachine};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-
-    if args.len() < 2 {
-        eprintln!("[ZDOS] Errore: Nessun file sorgente fornito.");
+    if args.len() != 2 {
         eprintln!("Uso: zlang <file.zlang>");
-        process::exit(1);
+        process::exit(2);
     }
 
     let filename = &args[1];
-
-    // Gestione sicura degli errori I/O senza panic!
     let source = match fs::read_to_string(filename) {
         Ok(content) => content,
-        Err(e) => {
-            eprintln!(
-                "[ZDOS] Errore di I/O nella lettura di '{}': {}",
-                filename, e
-            );
+        Err(error) => {
+            eprintln!("[Zlang] errore di lettura per {filename:?}: {error}");
             process::exit(1);
         }
     };
 
-    // 1. Fase di Compilazione
-    let mut compiler = Compiler::new();
-    let bytecode = compiler.compile(&source);
+    let compiler = Compiler::new();
+    let bytecode = match compiler.compile(&source) {
+        Ok(bytecode) => bytecode,
+        Err(error) => {
+            eprintln!("[Zlang] errore di compilazione: {error}");
+            process::exit(1);
+        }
+    };
 
-    // 2. Fase di Esecuzione (VM)
-    let mut vm = ZVirtualMachine::new();
-    let output = vm.execute(bytecode);
-
-    print!("{}", output);
+    let output = match ZVirtualMachine::new().execute(&bytecode) {
+        Ok(output) => output,
+        Err(error) => {
+            eprintln!("[Zlang] errore della VM: {error}");
+            process::exit(1);
+        }
+    };
+    print!("{output}");
 }
