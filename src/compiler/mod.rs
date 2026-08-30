@@ -77,7 +77,9 @@ mod tests {
 
     #[test]
     fn compiles_emit_to_zlb2() {
-        let bytecode = Compiler::new().compile("emit ciao\n").expect("valid source");
+        let bytecode = Compiler::new()
+            .compile("emit ciao\n")
+            .expect("valid source");
         assert_eq!(&bytecode[..6], ZLB2_HEADER);
         assert!(bytecode.windows(4).any(|window| window == b"ciao"));
         assert_eq!(&bytecode[bytecode.len() - 3..], &[0xff, 0x00, 0x00]);
@@ -85,7 +87,9 @@ mod tests {
 
     #[test]
     fn rejects_unimplemented_constructs() {
-        let error = Compiler::new().compile("let value = 1\n").expect_err("must fail closed");
+        let error = Compiler::new()
+            .compile("let value = 1\n")
+            .expect_err("must fail closed");
         assert!(error.to_string().contains("non supportata"));
     }
 }

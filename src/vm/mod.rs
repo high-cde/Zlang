@@ -44,7 +44,8 @@ impl ZVirtualMachine {
                 return Err(VmError::new("header del record ZLB2 troncato"));
             }
             let opcode = bytecode[offset];
-            let payload_len = u16::from_le_bytes([bytecode[offset + 1], bytecode[offset + 2]]) as usize;
+            let payload_len =
+                u16::from_le_bytes([bytecode[offset + 1], bytecode[offset + 2]]) as usize;
             let payload_start = offset + 3;
             let payload_end = payload_start
                 .checked_add(payload_len)
@@ -86,15 +87,21 @@ mod tests {
 
     #[test]
     fn executes_emit_bytecode() {
-        let bytecode = Compiler::new().compile("emit ciao\n").expect("valid source");
-        let output = ZVirtualMachine::new().execute(&bytecode).expect("valid bytecode");
+        let bytecode = Compiler::new()
+            .compile("emit ciao\n")
+            .expect("valid source");
+        let output = ZVirtualMachine::new()
+            .execute(&bytecode)
+            .expect("valid bytecode");
         assert_eq!(output, "ciao\n");
     }
 
     #[test]
     fn rejects_unimplemented_opcode() {
         let bytecode = b"ZLB2\x02\x05\x02\x00\x00\xff\x00\x00";
-        let error = ZVirtualMachine::new().execute(bytecode).expect_err("must fail closed");
+        let error = ZVirtualMachine::new()
+            .execute(bytecode)
+            .expect_err("must fail closed");
         assert!(error.to_string().contains("non supportato"));
     }
 }
