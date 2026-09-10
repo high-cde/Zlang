@@ -288,4 +288,3 @@ Il progetto è ancora giovane, ma la direzione è concreta: dal sorgente Zlang a
 [3]: https://github.com/high-cde/ZDOS/blob/main/os/x86_64/kernel/zlang.c "Runtime ZLB2 nel kernel ZDOS"
 [4]: https://github.com/high-cde/ZDOS/blob/main/evidence/README.md "ZDOS Evidence Chain"
 [5]: https://github.com/high-cde/ZDOS/blob/main/docs/FOUNDATION.md "ZDOS Foundation"
-[6]: https://github.com/high-cde/ZDOS-SEC-PORTAL "Repository ZDOS-SEC-PORTAL"

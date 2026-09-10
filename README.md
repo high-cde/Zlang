@@ -149,7 +149,6 @@ La guida coordinata [ZDOS–Zlang–ZRetro](docs/ZDOS_ZRETRO_BRIDGE.md) document
 |---|---|---|
 | **ZDOS** | Kernel, distribuzione Linux e pipeline di boot | [Repository ZDOS](https://github.com/high-cde/ZDOS) |
 | **Zlang** | Compilatore e contratto ZLB2 v2.5 | Questo repository |
-| **ZDOS-SEC** | HUD, feed, ledger locale e stream Socket.IO | [Repository ZDOS-SEC-PORTAL](https://github.com/high-cde/ZDOS-SEC-PORTAL) |
 
 La mappa dei contratti e le convenzioni documentali dell’ecosistema sono disponibili in [`docs/ECOSYSTEM.md`](https://github.com/high-cde/ZDOS/blob/main/docs/ECOSYSTEM.md) e [`docs/DOCUMENTATION_STYLE.md`](https://github.com/high-cde/ZDOS/blob/main/docs/DOCUMENTATION_STYLE.md).
 
