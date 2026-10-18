@@ -1,21 +1,16 @@
-MIT License
+ZDOS SOVEREIGN ENTERPRISE LICENSE (ZSEL-1.0)
+Strictly Proprietary & Confidential
 
-Copyright (c) 2026 high-cde
+Copyright (c) 2026 high-cde / ZDOS Ecosystem. All Rights Reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. PROHIBITION OF UNAUTHORIZED USE AND CLONING
+Unauthorized duplication, cloning, distribution, or mirroring of this repository, in whole or in part, across any public or private infrastructure without explicit written consent from the copyright holder is strictly prohibited.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+2. RESTRICTION ON MODIFICATIONS AND DERIVATIVE WORKS
+No entity, user, or automated system is permitted to modify, adapt, reverse engineer, decompile, or create derivative works based upon any source code, documentation, or architecture contained within this repository.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+3. PROHIBITION OF INAPPROPRIATE OR UNETHICAL DEPLOYMENT
+This software and its underlying ZLang modules must not be utilized for malicious activities, unauthorized surveillance, exploitation, or any deployment that violates the foundational principles of the ZDOS sovereign architecture and the Data Sovereignty Network (DSN).
+
+4. NO WARRANTY
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY.
