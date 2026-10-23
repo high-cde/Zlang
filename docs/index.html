@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZDOS Sovereign Blockchain & vCPU Terminal</title>
+    <title>ZDOS Sovereign Dashboard & .zbag Wallet</title>
     <style>
         :root {
             --bg-color: #030307;
-            --term-bg: rgba(8, 8, 16, 0.9);
+            --term-bg: rgba(8, 8, 16, 0.95);
             --primary: #00ffcc;
             --secondary: #ff007f;
             --accent: #9d00ff;
@@ -26,23 +26,9 @@
             min-height: 100vh;
             box-sizing: border-box;
         }
-        header {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        h1 {
-            color: var(--primary);
-            font-size: 1.6rem;
-            margin: 0 0 5px 0;
-            text-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
-            letter-spacing: 2px;
-        }
-        p.subtitle {
-            color: var(--secondary);
-            font-size: 0.85rem;
-            margin: 0;
-            letter-spacing: 1px;
-        }
+        header { text-align: center; margin-bottom: 15px; }
+        h1 { color: var(--primary); font-size: 1.4rem; margin: 0 0 5px 0; text-shadow: 0 0 12px rgba(0, 255, 204, 0.4); letter-spacing: 2px; }
+        p.subtitle { color: var(--secondary); font-size: 0.75rem; margin: 0; letter-spacing: 1px; }
         .main-layout {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -51,9 +37,7 @@
             max-width: 1100px;
             flex: 1;
         }
-        @media (max-width: 768px) {
-            .main-layout { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 768px) { .main-layout { grid-template-columns: 1fr; } }
         .terminal-container, .sidebar-panel {
             background: var(--term-bg);
             border: 1px solid var(--border);
@@ -62,7 +46,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            height: 550px;
+            height: 520px;
         }
         .panel-header {
             background: rgba(0, 255, 204, 0.08);
@@ -71,12 +55,12 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--primary);
             font-weight: bold;
         }
         .dots { display: flex; gap: 6px; }
-        .dot { width: 9px; height: 9px; border-radius: 50%; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
         .dot-red { background: #ff5f56; }
         .dot-yellow { background: #ffbd2e; }
         .dot-green { background: #27c93f; }
@@ -87,7 +71,7 @@
             overflow-y: auto;
             white-space: pre-wrap;
             word-break: break-all;
-            font-size: 0.9rem;
+            font-size: 0.82rem;
             line-height: 1.4;
         }
         .terminal-input-line {
@@ -99,198 +83,153 @@
         }
         .prompt { color: var(--secondary); margin-right: 8px; font-weight: bold; }
         input#commandInput {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: var(--primary);
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.95rem;
-            outline: none;
+            flex: 1; background: transparent; border: none; color: var(--primary);
+            font-family: 'Courier New', Courier, monospace; font-size: 0.85rem; outline: none;
         }
-        .sidebar-content {
-            padding: 15px;
-            overflow-y: auto;
-            font-size: 0.85rem;
-        }
+        .sidebar-content { padding: 12px; overflow-y: auto; font-size: 0.78rem; }
         .stat-box {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 10px;
-            margin-bottom: 12px;
+            border-radius: 6px; padding: 8px 10px; margin-bottom: 10px;
         }
-        .stat-title { color: var(--secondary); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px; }
-        .stat-value { color: var(--primary); font-size: 1.1rem; font-weight: bold; }
-        
-        .actions {
-            margin-top: 15px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+        .stat-title { color: var(--secondary); font-size: 0.68rem; text-transform: uppercase; margin-bottom: 2px; }
+        .stat-value { color: var(--primary); font-size: 0.95rem; font-weight: bold; }
+        .actions { margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
         button {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            padding: 8px 14px;
-            cursor: pointer;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.85rem;
-            border-radius: 4px;
-            transition: all 0.2s ease;
+            background: transparent; border: 1px solid var(--primary); color: var(--primary);
+            padding: 7px 12px; cursor: pointer; font-family: 'Courier New', Courier, monospace;
+            font-size: 0.78rem; border-radius: 4px; transition: all 0.2s ease;
         }
-        button:hover {
-            background: var(--primary);
-            color: var(--bg-color);
-            box-shadow: 0 0 10px var(--primary);
-        }
+        button:hover { background: var(--primary); color: var(--bg-color); box-shadow: 0 0 10px var(--primary); }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>ZDOS SOVEREIGN BLOCKCHAIN NODE</h1>
-        <p class="subtitle">ZLang vCPU Runtime & vRAM State Trie Explorer</p>
+        <h1>ZDOS SOVEREIGN DASHBOARD & .zbag WALLET</h1>
+        <p class="subtitle">ZLB2 vCPU Runtime | vRAM State Trie | Native .zbag Crypto</p>
     </header>
 
     <div class="main-layout">
-        <!-- Terminale principale -->
+        <!-- Terminale Interattivo -->
         <div class="terminal-container">
             <div class="panel-header">
-                <div class="dots">
-                    <div class="dot dot-red"></div>
-                    <div class="dot dot-yellow"></div>
-                    <div class="dot dot-green"></div>
-                </div>
-                <span>zdos-chain@vmi3082470:~</span>
-                <span>ZLB2 vCPU Active</span>
+                <div class="dots"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div></div>
+                <span>zdos-wallet@sovereign-node:~</span>
+                <span>ZComm Active</span>
             </div>
-            <div id="output" class="terminal-output">ZDOS Sovereign Kernel v2026.2.0 avviato.
-Digita 'help' per visualizzare i comandi disponibili o premi 'Esegui Transazione' per simulare lo smart contract sulla vCPU.
+            <div id="output" class="terminal-output">ZDOS Sovereign Dashboard v2026.2 caricata.
+Benvenuto in HighKali Node (Oltrepò Pavese).
+Digita 'help' per visualizzare i comandi disponibili o usa i pulsanti rapidi per gestire il wallet .zbag.
 </div>
             <div class="terminal-input-line">
-                <span class="prompt">zdos@node:~$</span>
-                <input type="text" id="commandInput" autofocus autocomplete="off" placeholder="Inserisci comando (es. run, regs, help)...">
+                <span class="prompt">zdos@wallet:~$</span>
+                <input type="text" id="commandInput" autofocus autocomplete="off" placeholder="Comandi: wallet, sign, send, help...">
             </div>
         </div>
 
-        <!-- Pannello laterale Stato Chain & vCPU -->
+        <!-- Sidebar Dashboard .zbag -->
         <div class="sidebar-panel">
             <div class="panel-header">
-                <span>STATE TRIE & vCPU STATUS</span>
-                <span style="color: #27c93f;">● LIVE</span>
+                <span>.zbag WALLET & STATE</span>
+                <span style="color: #27c93f;">● SECURE</span>
             </div>
             <div class="sidebar-content">
                 <div class="stat-box">
-                    <div class="stat-title">Altezza Chain (Block #)</div>
-                    <div id="statHeight" class="stat-value">1</div>
+                    <div class="stat-title">Wallet Attivo (.zbag)</div>
+                    <div id="walletAddr" class="stat-value" style="font-size: 0.75rem; color: #ff007f;">zdos_wallet_highkali_13</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-title">Saldo Sovrano (R1 / vRAM)</div>
-                    <div id="statBalance" class="stat-value">100,000 ZDOS</div>
+                    <div class="stat-title">Saldo vRAM (R1)</div>
+                    <div id="walletBalance" class="stat-value">95,000 ZDOS</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-title">Ultimo Trasferimento (R2)</div>
-                    <div id="statTransfer" class="stat-value">2,500 ZDOS</div>
+                    <div class="stat-title">Ultima Firma Sha256</div>
+                    <div id="walletSig" class="stat-value" style="font-size: 0.7rem; word-break: break-all;">a1b2c3d4e5f67890...</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-title">vRAM State Trie Addr</div>
-                    <div class="stat-value" style="font-size: 0.9rem; color: #ff007f;">0x0100 (Balance)</div>
+                    <div class="stat-title">Altezza Chain / Blocchi</div>
+                    <div id="chainHeight" class="stat-value">#2 (00003d3b...)</div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="actions">
-        <button onclick="runDefaultTx()">Esegui Transazione Chain</button>
-        <button onclick="showRegisters()">Stato Registri vCPU</button>
-        <button onclick="clearTerminal()">Pulisci Terminale</button>
+        <button onclick="loadWallet()">Carica .zbag</button>
+        <button onclick="signTx()">Firma Transazione</button>
+        <button onclick="broadcastTx()">Broadcast Mesh</button>
+        <button onclick="clearTerminal()">Pulisci</button>
     </div>
 
     <script>
         const output = document.getElementById('output');
         const input = document.getElementById('commandInput');
-        const statBalance = document.getElementById('statBalance');
-        const statHeight = document.getElementById('statHeight');
+        const walletBalance = document.getElementById('walletBalance');
+        const walletSig = document.getElementById('walletSig');
 
-        let chainState = {
-            height: 1,
-            balance: 100000,
-            transfer: 2500
-        };
+        let balance = 95000;
 
         function printToTerminal(text, isError = false) {
             output.innerHTML += `<span style="color: ${isError ? '#ff5f56' : 'inherit'}">${text}</span>\n`;
             output.scrollTop = output.scrollHeight;
         }
 
-        function runDefaultTx() {
-            printToTerminal("\n=== AVVIO TRANSAZIONE NATIVA ZDOS CHAIN ===");
-            printToTerminal('[vCPU] R1 = 100000 (LOAD IMM)');
-            printToTerminal('[vCPU vRAM] Salvato R1 (100000) all\'indirizzo vRAM 0x0100');
-            printToTerminal('[vCPU OUT] Registro R1 = 100000');
-            
+        function loadWallet() {
+            printToTerminal("\n[zbag Wallet] Scansione file .zbag locali...");
+            printToTerminal("Trovato: tx_test.zbag");
+            printToTerminal("Sender:    zdos_wallet_highkali_13");
+            printToTerminal("Recipient: zdos_validator_node_01");
+            printToTerminal("Importo:   5,000 ZDOS");
+            printToTerminal("Nonce:     1");
+            printToTerminal("Stato:     VALIDATO & PRONTO AL FIRMARE ✅\n");
+        }
+
+        function signTx() {
+            printToTerminal("\n[Crypto] Generazione firma Sha256 per il pacchetto .zbag...");
             setTimeout(() => {
-                printToTerminal('[vCPU] R2 = 2500 (LOAD IMM)');
-                printToTerminal('[vCPU vRAM] Salvato R2 (2500) all\'indirizzo vRAM 0x0108');
-                printToTerminal('[vCPU OUT] Registro R2 = 2500');
+                const sig = "000060a1e2225982f36330ffa6e123d8ece96a438fea6cf";
+                walletSig.textContent = sig;
+                printToTerminal("[+].zbag Firmato con successo!");
+                printToTerminal("Firma SHA256: " + sig + "\n");
             }, 400);
+        }
 
+        function broadcastTx() {
+            printToTerminal("\n[ZComm Mesh] Propagazione transazione firmata alla rete...");
             setTimeout(() => {
-                chainState.balance -= chainState.transfer;
-                chainState.height += 1;
-                statBalance.textContent = chainState.balance.toLocaleString() + " ZDOS";
-                statHeight.textContent = chainState.height;
-
-                printToTerminal('[vCPU] R1 = R1 - R2 (Valore: ' + chainState.balance + ')');
-                printToTerminal('[vCPU vRAM] Salvato R1 (' + chainState.balance + ') all\'indirizzo vRAM 0x0100');
-                printToTerminal('[vCPU OUT] Registro R1 = ' + chainState.balance);
-                printToTerminal('[vCPU] HALT raggiunto');
-                printToTerminal('=== TRANSAZIONE ESEGUITA CON SUCCESSO (Block #' + chainState.height + ') ===\n', false);
-            }, 800);
+                balance -= 5000;
+                walletBalance.textContent = balance.toLocaleString() + " ZDOS";
+                printToTerminal("[+] Blocco minato e transazione inclusa nel Ledger!");
+                printToTerminal("[+] Nuovo saldo aggiornato nella vRAM State Trie: " + balance + " ZDOS\n");
+            }, 600);
         }
 
-        function showRegisters() {
-            printToTerminal("\n--- STATO REGISTRI vCPU & STATE TRIE ---");
-            printToTerminal(`R1 (sovereign_balance): ${chainState.balance}`);
-            printToTerminal(`R2 (transfer_amount):   ${chainState.transfer}`);
-            printToTerminal(`Chain Height:           ${chainState.height}`);
-            printToTerminal(`vRAM [0x0100] (State):  ${chainState.balance}`);
-            printToTerminal(`vRAM [0x0108] (Tx):     ${chainState.transfer}`);
-            printToTerminal("----------------------------------------\n");
-        }
-
-        function clearTerminal() {
-            output.innerHTML = "Terminal cleared.\n";
-        }
+        function clearTerminal() { output.innerHTML = "Terminal cleared.\n"; }
 
         input.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 const cmd = input.value.trim();
                 if (!cmd) return;
-                
-                printToTerminal(`zdos@node:~$ ${cmd}`);
+                printToTerminal(`zdos@wallet:~$ ${cmd}`);
                 input.value = '';
-
                 const lower = cmd.toLowerCase();
                 if (lower === 'help') {
                     printToTerminal("Comandi disponibili:");
-                    printToTerminal("  run      - Esegue la transazione nativa della chain");
-                    printToTerminal("  regs     - Mostra lo stato dei registri vCPU e vRAM");
-                    printToTerminal("  clear    - Pulisce lo schermo del terminale");
-                    printToTerminal("  node     - Mostra informazioni sul nodo sovereign\n");
-                } else if (lower === 'run') {
-                    runDefaultTx();
-                } else if (lower === 'regs' || lower === 'registers') {
-                    showRegisters();
+                    printToTerminal("  wallet   - Legge i dettagli del file .zbag");
+                    printToTerminal("  sign     - Esegue la firma crittografica della tx");
+                    printToTerminal("  broadcast- Invia la tx firmata alla rete mesh");
+                    printToTerminal("  clear    - Pulisce la schermata");
+                } else if (lower === 'wallet') {
+                    loadWallet();
+                } else if (lower === 'sign') {
+                    signTx();
+                } else if (lower === 'broadcast' || lower === 'send') {
+                    broadcastTx();
                 } else if (lower === 'clear') {
                     clearTerminal();
-                } else if (lower === 'node') {
-                    printToTerminal("ZDOS Sovereign Node [vmi3082470] - Oltrepò Pavese Network");
-                    printToTerminal("Status: VALIDATED | Consensus: Deterministic vCPU v2\n");
                 } else {
-                    printToTerminal(`Comando sconosciuto: '${cmd}'. Digita 'help' per la lista comandi.`, true);
+                    printToTerminal(`Comando sconosciuto: '${cmd}'. Digita 'help'.`, true);
                 }
             }
         });
