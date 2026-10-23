@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZDOS Sovereign Dashboard & .zbag Wallet</title>
+    <title>ZDOS Sovereign Terminal & Wallet</title>
     <style>
         :root {
             --bg-color: #030307;
@@ -14,6 +14,26 @@
             --text: #d0d0e0;
             --border: #00ffcc33;
         }
+        
+        /* Effetto CRT Globale */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: 
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 1000;
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            opacity: 0.7;
+            border-radius: inherit;
+        }
+        
         body {
             background-color: var(--bg-color);
             color: var(--text);
@@ -25,10 +45,27 @@
             align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
+            overflow: hidden; /* Per la curvatura */
         }
-        header { text-align: center; margin-bottom: 15px; }
-        h1 { color: var(--primary); font-size: 1.4rem; margin: 0 0 5px 0; text-shadow: 0 0 12px rgba(0, 255, 204, 0.4); letter-spacing: 2px; }
+
+        /* Curvatura dello schermo */
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%);
+            pointer-events: none;
+            z-index: 1001;
+        }
+
+        header { text-align: center; margin-bottom: 15px; position: relative; z-index: 5; text-shadow: 0 0 5px var(--primary); }
+        h1 { color: var(--primary); font-size: 1.4rem; margin: 0 0 5px 0; text-shadow: 0 0 15px var(--primary); letter-spacing: 3px; font-weight: bold;}
         p.subtitle { color: var(--secondary); font-size: 0.75rem; margin: 0; letter-spacing: 1px; }
+        
         .main-layout {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -36,20 +73,41 @@
             width: 100%;
             max-width: 1100px;
             flex: 1;
+            position: relative;
+            z-index: 5;
         }
         @media (max-width: 768px) { .main-layout { grid-template-columns: 1fr; } }
+        
         .terminal-container, .sidebar-panel {
             background: var(--term-bg);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
+            border-radius: 12px; /* Bordi leggermente più smussati */
+            box-shadow: 
+                0 0 15px rgba(0, 255, 204, 0.2),
+                inset 0 0 5px rgba(0, 255, 204, 0.1);
             display: flex;
             flex-direction: column;
             overflow: hidden;
             height: 520px;
+            position: relative;
         }
+
+        /* Effetto riflesso superiore */
+        .terminal-container::before, .sidebar-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(rgba(255,255,255,0.03), rgba(255,255,255,0));
+            pointer-events: none;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+
         .panel-header {
-            background: rgba(0, 255, 204, 0.08);
+            background: rgba(0, 255, 204, 0.12);
             padding: 10px 15px;
             display: flex;
             justify-content: space-between;
@@ -58,12 +116,14 @@
             font-size: 0.75rem;
             color: var(--primary);
             font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .dots { display: flex; gap: 6px; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; }
-        .dot-red { background: #ff5f56; }
-        .dot-yellow { background: #ffbd2e; }
-        .dot-green { background: #27c93f; }
+        .dot { width: 9px; height: 9px; border-radius: 50%; box-shadow: 0 0 4px currentColor; }
+        .dot-red { background: #ff5f56; color: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; color: #ffbd2e; }
+        .dot-green { background: #27c93f; color: #27c93f; }
         
         .terminal-output {
             flex: 1;
@@ -71,43 +131,61 @@
             overflow-y: auto;
             white-space: pre-wrap;
             word-break: break-all;
-            font-size: 0.82rem;
-            line-height: 1.4;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: var(--text);
+            /* Bagliore del testo */
+            text-shadow: 
+                0 0 5px var(--primary),
+                0 0 10px var(--primary);
         }
         .terminal-input-line {
             display: flex;
             padding: 10px 15px;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.3);
             border-top: 1px solid var(--border);
             align-items: center;
+            margin-top: auto;
         }
-        .prompt { color: var(--secondary); margin-right: 8px; font-weight: bold; }
+        .prompt { color: var(--secondary); margin-right: 8px; font-weight: bold; text-shadow: 0 0 5px var(--secondary); }
         input#commandInput {
             flex: 1; background: transparent; border: none; color: var(--primary);
-            font-family: 'Courier New', Courier, monospace; font-size: 0.85rem; outline: none;
+            font-family: 'Courier New', Courier, monospace; font-size: 0.9rem; outline: none;
+            text-shadow: 0 0 5px var(--primary);
         }
         .sidebar-content { padding: 12px; overflow-y: auto; font-size: 0.78rem; }
         .stat-box {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--border);
-            border-radius: 6px; padding: 8px 10px; margin-bottom: 10px;
+            border-radius: 8px; padding: 10px; margin-bottom: 10px;
+            box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.02);
         }
-        .stat-title { color: var(--secondary); font-size: 0.68rem; text-transform: uppercase; margin-bottom: 2px; }
-        .stat-value { color: var(--primary); font-size: 0.95rem; font-weight: bold; }
-        .actions { margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        .stat-title { color: var(--secondary); font-size: 0.68rem; text-transform: uppercase; margin-bottom: 3px; letter-spacing: 1px; }
+        .stat-value { color: var(--primary); font-size: 1rem; font-weight: bold; text-shadow: 0 0 5px var(--primary); }
+        .actions { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; position: relative; z-index: 5; }
         button {
             background: transparent; border: 1px solid var(--primary); color: var(--primary);
-            padding: 7px 12px; cursor: pointer; font-family: 'Courier New', Courier, monospace;
-            font-size: 0.78rem; border-radius: 4px; transition: all 0.2s ease;
+            padding: 8px 15px; cursor: pointer; font-family: 'Courier New', Courier, monospace;
+            font-size: 0.8rem; border-radius: 6px; transition: all 0.2s ease;
+            text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 0 8px rgba(0, 255, 204, 0.2);
         }
-        button:hover { background: var(--primary); color: var(--bg-color); box-shadow: 0 0 10px var(--primary); }
+        button:hover {
+            background: var(--primary); color: var(--bg-color);
+            box-shadow: 0 0 15px var(--primary), 0 0 30px var(--primary);
+        }
+
+        /* Scrollbar personalizzata */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--term-bg); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; box-shadow: 0 0 5px var(--primary); }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>ZDOS SOVEREIGN DASHBOARD & .zbag WALLET</h1>
-        <p class="subtitle">ZLB2 vCPU Runtime | vRAM State Trie | Native .zbag Crypto</p>
+        <h1>ZDOS SOVEREIGN TERMINAL & WALLET</h1>
+        <p class="subtitle">ZLB2 vCPU | vRAM State Trie | Native .zbag Crypto</p>
     </header>
 
     <div class="main-layout">
@@ -118,7 +196,7 @@
                 <span>zdos-wallet@sovereign-node:~</span>
                 <span>ZComm Active</span>
             </div>
-            <div id="output" class="terminal-output">ZDOS Sovereign Dashboard v2026.2 caricata.
+            <div id="output" class="terminal-output">ZDOS Sovereign Terminal v2026.2 caricato.
 Benvenuto in HighKali Node (Oltrepò Pavese).
 Digita 'help' per visualizzare i comandi disponibili o usa i pulsanti rapidi per gestire il wallet .zbag.
 </div>
@@ -137,7 +215,7 @@ Digita 'help' per visualizzare i comandi disponibili o usa i pulsanti rapidi per
             <div class="sidebar-content">
                 <div class="stat-box">
                     <div class="stat-title">Wallet Attivo (.zbag)</div>
-                    <div id="walletAddr" class="stat-value" style="font-size: 0.75rem; color: #ff007f;">zdos_wallet_highkali_13</div>
+                    <div id="walletAddr" class="stat-value" style="font-size: 0.85rem; color: #ff007f; text-shadow: 0 0 8px #ff007f;">zdos_wallet_highkali_13</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-title">Saldo vRAM (R1)</div>
@@ -171,7 +249,7 @@ Digita 'help' per visualizzare i comandi disponibili o usa i pulsanti rapidi per
         let balance = 95000;
 
         function printToTerminal(text, isError = false) {
-            output.innerHTML += `<span style="color: ${isError ? '#ff5f56' : 'inherit'}">${text}</span>\n`;
+            output.innerHTML += `<span style="color: ${isError ? '#ff5f56' : 'inherit'}; text-shadow: ${isError ? '0 0 8px #ff5f56' : 'inherit'}">${text}</span>\n`;
             output.scrollTop = output.scrollHeight;
         }
 
