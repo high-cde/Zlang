@@ -3,313 +3,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZDOS Sovereign Terminal & Wallet</title>
+    <title>ZDOS Videotel & ZComm SLY Network</title>
     <style>
         :root {
-            --bg-color: #030307;
-            --term-bg: rgba(8, 8, 16, 0.95);
+            --bg-color: #020205;
+            --term-bg: rgba(6, 6, 12, 0.95);
             --primary: #00ffcc;
             --secondary: #ff007f;
-            --accent: #9d00ff;
-            --text: #d0d0e0;
-            --border: #00ffcc33;
+            --accent: #bd00ff;
+            --text: #e0e0f0;
+            --border: #00ffcc44;
         }
         
-        /* Effetto CRT Globale */
+        /* Effetto CRT Videotel d'epoca */
         body::before {
             content: " ";
             display: block;
             position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            background: 
-                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.04));
             z-index: 1000;
-            background-size: 100% 4px, 3px 100%;
+            background-size: 100% 3px, 3px 100%;
             pointer-events: none;
-            opacity: 0.7;
-            border-radius: inherit;
         }
-        
+
         body {
             background-color: var(--bg-color);
             color: var(--text);
             font-family: 'Courier New', Courier, monospace;
             margin: 0;
-            padding: 15px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
-            overflow: hidden; /* Per la curvatura */
         }
 
-        /* Curvatura dello schermo */
-        body::after {
-            content: " ";
-            display: block;
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%);
-            pointer-events: none;
-            z-index: 1001;
-        }
+        header { text-align: center; margin-bottom: 10px; z-index: 5; }
+        h1 { color: var(--primary); font-size: 1.2rem; margin: 0 0 3px 0; text-shadow: 0 0 10px var(--primary); letter-spacing: 2px; }
+        p.subtitle { color: var(--secondary); font-size: 0.68rem; margin: 0; letter-spacing: 1px; text-shadow: 0 0 5px var(--secondary); }
 
-        header { text-align: center; margin-bottom: 15px; position: relative; z-index: 5; text-shadow: 0 0 5px var(--primary); }
-        h1 { color: var(--primary); font-size: 1.4rem; margin: 0 0 5px 0; text-shadow: 0 0 15px var(--primary); letter-spacing: 3px; font-weight: bold;}
-        p.subtitle { color: var(--secondary); font-size: 0.75rem; margin: 0; letter-spacing: 1px; }
-        
-        .main-layout {
+        .dashboard-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 15px;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 12px;
             width: 100%;
             max-width: 1100px;
             flex: 1;
-            position: relative;
             z-index: 5;
         }
-        @media (max-width: 768px) { .main-layout { grid-template-columns: 1fr; } }
-        
-        .terminal-container, .sidebar-panel {
+        @media (max-width: 800px) { .dashboard-grid { grid-template-columns: 1fr; } }
+
+        .card {
             background: var(--term-bg);
             border: 1px solid var(--border);
-            border-radius: 12px; /* Bordi leggermente più smussati */
-            box-shadow: 
-                0 0 15px rgba(0, 255, 204, 0.2),
-                inset 0 0 5px rgba(0, 255, 204, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.15), inset 0 0 10px rgba(0, 255, 204, 0.05);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            height: 520px;
             position: relative;
         }
 
-        /* Effetto riflesso superiore */
-        .terminal-container::before, .sidebar-panel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 40px;
-            background: linear-gradient(rgba(255,255,255,0.03), rgba(255,255,255,0));
-            pointer-events: none;
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
-        }
-
-        .panel-header {
-            background: rgba(0, 255, 204, 0.12);
-            padding: 10px 15px;
+        .card-title {
+            color: var(--primary);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+            margin-bottom: 8px;
+            font-weight: bold;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.75rem;
-            color: var(--primary);
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .dots { display: flex; gap: 6px; }
-        .dot { width: 9px; height: 9px; border-radius: 50%; box-shadow: 0 0 4px currentColor; }
-        .dot-red { background: #ff5f56; color: #ff5f56; }
-        .dot-yellow { background: #ffbd2e; color: #ffbd2e; }
-        .dot-green { background: #27c93f; color: #27c93f; }
-        
-        .terminal-output {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-break: break-all;
-            font-size: 0.85rem;
-            line-height: 1.5;
-            color: var(--text);
-            /* Bagliore del testo */
-            text-shadow: 
-                0 0 5px var(--primary),
-                0 0 10px var(--primary);
-        }
-        .terminal-input-line {
-            display: flex;
-            padding: 10px 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border-top: 1px solid var(--border);
-            align-items: center;
-            margin-top: auto;
-        }
-        .prompt { color: var(--secondary); margin-right: 8px; font-weight: bold; text-shadow: 0 0 5px var(--secondary); }
-        input#commandInput {
-            flex: 1; background: transparent; border: none; color: var(--primary);
-            font-family: 'Courier New', Courier, monospace; font-size: 0.9rem; outline: none;
-            text-shadow: 0 0 5px var(--primary);
-        }
-        .sidebar-content { padding: 12px; overflow-y: auto; font-size: 0.78rem; }
-        .stat-box {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border);
-            border-radius: 8px; padding: 10px; margin-bottom: 10px;
-            box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.02);
-        }
-        .stat-title { color: var(--secondary); font-size: 0.68rem; text-transform: uppercase; margin-bottom: 3px; letter-spacing: 1px; }
-        .stat-value { color: var(--primary); font-size: 1rem; font-weight: bold; text-shadow: 0 0 5px var(--primary); }
-        .actions { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; position: relative; z-index: 5; }
-        button {
-            background: transparent; border: 1px solid var(--primary); color: var(--primary);
-            padding: 8px 15px; cursor: pointer; font-family: 'Courier New', Courier, monospace;
-            font-size: 0.8rem; border-radius: 6px; transition: all 0.2s ease;
-            text-transform: uppercase; letter-spacing: 1px;
-            box-shadow: 0 0 8px rgba(0, 255, 204, 0.2);
-        }
-        button:hover {
-            background: var(--primary); color: var(--bg-color);
-            box-shadow: 0 0 15px var(--primary), 0 0 30px var(--primary);
         }
 
-        /* Scrollbar personalizzata */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--term-bg); }
-        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; box-shadow: 0 0 5px var(--primary); }
+        .terminal-box {
+            background: #010104;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 10px;
+            height: 210px;
+            overflow-y: auto;
+            font-size: 0.76rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+            color: var(--text);
+            text-shadow: 0 0 4px var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 6px;
+        }
+
+        input {
+            flex: 1;
+            background: #010104;
+            border: 1px solid var(--border);
+            color: var(--primary);
+            padding: 7px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.78rem;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 7px 10px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            box-shadow: 0 0 6px rgba(0, 255, 204, 0.2);
+        }
+
+        button:hover {
+            background: var(--primary);
+            color: var(--bg-color);
+            box-shadow: 0 0 12px var(--primary);
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 5px 8px;
+            border-radius: 4px;
+            border-left: 3px solid var(--secondary);
+        }
+        .metric-val { color: var(--primary); font-weight: bold; }
+
+        .videotel-keypad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin-top: 8px;
+        }
+        .key-btn {
+            background: rgba(0,255,204,0.05);
+            border: 1px solid var(--border);
+            color: var(--primary);
+            padding: 6px;
+            font-size: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .key-btn:hover { background: var(--primary); color: #000; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>ZDOS SOVEREIGN TERMINAL & WALLET</h1>
-        <p class="subtitle">ZLB2 vCPU | vRAM State Trie | Native .zbag Crypto</p>
+        <h1>ZDOS VIDEOTEL SLY — RETE MESH & DSN</h1>
+        <p class="subtitle">Utility di Comunicazione Sovrana | Nodo $DSN 0xfc9051...192c296</p>
     </header>
 
-    <div class="main-layout">
-        <!-- Terminale Interattivo -->
-        <div class="terminal-container">
-            <div class="panel-header">
-                <div class="dots"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div></div>
-                <span>zdos-wallet@sovereign-node:~</span>
-                <span>ZComm Active</span>
+    <div class="dashboard-grid">
+        <!-- Pannello 1: Terminale Videotel ZComm -->
+        <div class="card">
+            <div class="card-title">
+                <span>VIDEOTEL COMM TERMINAL (ZComm)</span>
+                <span style="color: #27c93f;">● CONNESSO</span>
             </div>
-            <div id="output" class="terminal-output">ZDOS Sovereign Terminal v2026.2 caricato.
-Benvenuto in HighKali Node (Oltrepò Pavese).
-Digita 'help' per visualizzare i comandi disponibili o usa i pulsanti rapidi per gestire il wallet .zbag.
+            <div id="termOutput" class="terminal-box">ZDOS Videotel v2026.2 avviato.
+Benvenuto nel sistema di messaggistica e dati stile SIP.
+Digita un comando o usa i tasti rapidi del Videotel.
 </div>
-            <div class="terminal-input-line">
-                <span class="prompt">zdos@wallet:~$</span>
-                <input type="text" id="commandInput" autofocus autocomplete="off" placeholder="Comandi: wallet, sign, send, help...">
+            <div class="input-group">
+                <input type="text" id="termInput" placeholder="Inserisci comando o codice Videotel..." autocomplete="off">
+                <button onclick="executeCommand()">Invia</button>
+            </div>
+            <div class="videotel-keypad">
+                <div class="key-btn" onclick="sendCode('1')">1: SERVIZI</div>
+                <div class="key-btn" onclick="sendCode('2')">2: $DSN CHAT</div>
+                <div class="key-btn" onclick="sendCode('3')">3: ZVL YIELD</div>
+                <div class="key-btn" onclick="sendCode('4')">4: MESH STATS</div>
             </div>
         </div>
 
-        <!-- Sidebar Dashboard .zbag -->
-        <div class="sidebar-panel">
-            <div class="panel-header">
-                <span>.zbag WALLET & STATE</span>
-                <span style="color: #27c93f;">● SECURE</span>
+        <!-- Pannello 2: DApp SLY & $DSN Gateway -->
+        <div class="card">
+            <div class="card-title">
+                <span>SLY / $DSN UTILITY GATEWAY</span>
+                <span style="color: var(--secondary);">vRAM State</span>
             </div>
-            <div class="sidebar-content">
-                <div class="stat-box">
-                    <div class="stat-title">Wallet Attivo (.zbag)</div>
-                    <div id="walletAddr" class="stat-value" style="font-size: 0.85rem; color: #ff007f; text-shadow: 0 0 8px #ff007f;">zdos_wallet_highkali_13</div>
+            <div style="flex: 1;">
+                <div class="metric-row">
+                    <span>Gateway $DSN:</span>
+                    <span class="metric-val" style="font-size: 0.65rem; color: var(--secondary);">0xfc90...296</span>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-title">Saldo vRAM (R1)</div>
-                    <div id="walletBalance" class="stat-value">95,000 ZDOS</div>
+                <div class="metric-row">
+                    <span>Utility ZVL (Rescue/Comm):</span>
+                    <span id="zvlBalance" class="metric-val">12,500 ZVL</span>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-title">Ultima Firma Sha256</div>
-                    <div id="walletSig" class="stat-value" style="font-size: 0.7rem; word-break: break-all;">a1b2c3d4e5f67890...</div>
+                <div class="metric-row">
+                    <span>Canale Videotel Attivo:</span>
+                    <span class="metric-val">#8333 (ZComm Mesh)</span>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-title">Altezza Chain / Blocchi</div>
-                    <div id="chainHeight" class="stat-value">#2 (00003d3b...)</div>
+                <div class="metric-row">
+                    <span>Stato State Trie:</span>
+                    <span class="metric-val" style="color: #27c93f;">Sincronizzato ✅</span>
                 </div>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <button style="flex: 1; border-color: var(--secondary); color: var(--secondary);" onclick="openVideotelChannel()">Apri Videotel</button>
+                <button style="flex: 1;" onclick="burnZvlUtility()">Usa ZVL Utility</button>
             </div>
         </div>
-    </div>
-
-    <div class="actions">
-        <button onclick="loadWallet()">Carica .zbag</button>
-        <button onclick="signTx()">Firma Transazione</button>
-        <button onclick="broadcastTx()">Broadcast Mesh</button>
-        <button onclick="clearTerminal()">Pulisci</button>
     </div>
 
     <script>
-        const output = document.getElementById('output');
-        const input = document.getElementById('commandInput');
-        const walletBalance = document.getElementById('walletBalance');
-        const walletSig = document.getElementById('walletSig');
+        const termOutput = document.getElementById('termOutput');
+        const termInput = document.getElementById('termInput');
+        const zvlBalance = document.getElementById('zvlBalance');
+        let zvlAmount = 12500;
 
-        let balance = 95000;
-
-        function printToTerminal(text, isError = false) {
-            output.innerHTML += `<span style="color: ${isError ? '#ff5f56' : 'inherit'}; text-shadow: ${isError ? '0 0 8px #ff5f56' : 'inherit'}">${text}</span>\n`;
-            output.scrollTop = output.scrollHeight;
+        function logTerm(text, isErr = false) {
+            termOutput.innerHTML += `<span style="color: ${isErr ? '#ff5f56' : 'inherit'}">${text}</span>\n`;
+            termOutput.scrollTop = termOutput.scrollHeight;
         }
 
-        function loadWallet() {
-            printToTerminal("\n[zbag Wallet] Scansione file .zbag locali...");
-            printToTerminal("Trovato: tx_test.zbag");
-            printToTerminal("Sender:    zdos_wallet_highkali_13");
-            printToTerminal("Recipient: zdos_validator_node_01");
-            printToTerminal("Importo:   5,000 ZDOS");
-            printToTerminal("Nonce:     1");
-            printToTerminal("Stato:     VALIDATO & PRONTO AL FIRMARE ✅\n");
+        function executeCommand() {
+            const cmd = termInput.value.trim().toLowerCase();
+            if (!cmd) return;
+            logTerm(`videotel@dsn:~$ ${cmd}`);
+            termInput.value = '';
+
+            if (cmd === 'help' || cmd === '1') {
+                logTerm("--- MENU VIDEOTEL ZDOS ---");
+                logTerm("  [2] $DSN Chat cifrata P2P");
+                logTerm("  [3] Utility ZVL (Canale di soccorso/comunicazione)");
+                logTerm("  [4] Stato nodi Mesh ZComm");
+            } else if (cmd === '2' || cmd === 'chat') {
+                logTerm("[*] Connessione al canale $DSN 0xfc90...192c296...");
+                logTerm("[+] Canale Videotel sicuro stabilito via ZComm Mesh. Pronto a trasmettere.");
+            } else if (cmd === '3' || cmd === 'zvl') {
+                logTerm("[*] Attivazione Utility ZVL: Banda di emergenza e routing dati attivi.");
+            } else if (cmd === '4' || cmd === 'status') {
+                logTerm("Gateway $DSN online. Latenza Mesh: 0.14ms. vRAM protetta.");
+            } else {
+                logTerm(`Comando / Codice non valido: ${cmd}`, true);
+            }
         }
 
-        function signTx() {
-            printToTerminal("\n[Crypto] Generazione firma Sha256 per il pacchetto .zbag...");
+        function sendCode(code) {
+            termInput.value = code;
+            executeCommand();
+        }
+
+        function openVideotelChannel() {
+            logTerm("\n[Videotel] Inizializzazione terminale grafico stile Minitel/SIP...");
             setTimeout(() => {
-                const sig = "000060a1e2225982f36330ffa6e123d8ece96a438fea6cf";
-                walletSig.textContent = sig;
-                printToTerminal("[+].zbag Firmato con successo!");
-                printToTerminal("Firma SHA256: " + sig + "\n");
+                logTerm("[+] Connesso al nodo $DSN 0xfc90516a1f736FaC557e09D8853dB80dA192c296");
+                logTerm("[+] Canale di comunicazione ZVL aperto. Trasmissione pacchetti .zbag attiva. 📞⚡️\n");
             }, 400);
         }
 
-        function broadcastTx() {
-            printToTerminal("\n[ZComm Mesh] Propagazione transazione firmata alla rete...");
+        function burnZvlUtility() {
+            logTerm("\n[ZVL Utility] Allocazione bandwidth di soccorso via $DSN...");
             setTimeout(() => {
-                balance -= 5000;
-                walletBalance.textContent = balance.toLocaleString() + " ZDOS";
-                printToTerminal("[+] Blocco minato e transazione inclusa nel Ledger!");
-                printToTerminal("[+] Nuovo saldo aggiornato nella vRAM State Trie: " + balance + " ZDOS\n");
-            }, 600);
+                zvlAmount -= 500;
+                zvlBalance.textContent = zvlAmount.toLocaleString() + " ZVL";
+                logTerm("[+] Transazione utility completata. -500 ZVL impiegati per il routing di emergenza. ✅\n");
+            }, 400);
         }
 
-        function clearTerminal() { output.innerHTML = "Terminal cleared.\n"; }
-
-        input.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const cmd = input.value.trim();
-                if (!cmd) return;
-                printToTerminal(`zdos@wallet:~$ ${cmd}`);
-                input.value = '';
-                const lower = cmd.toLowerCase();
-                if (lower === 'help') {
-                    printToTerminal("Comandi disponibili:");
-                    printToTerminal("  wallet   - Legge i dettagli del file .zbag");
-                    printToTerminal("  sign     - Esegue la firma crittografica della tx");
-                    printToTerminal("  broadcast- Invia la tx firmata alla rete mesh");
-                    printToTerminal("  clear    - Pulisce la schermata");
-                } else if (lower === 'wallet') {
-                    loadWallet();
-                } else if (lower === 'sign') {
-                    signTx();
-                } else if (lower === 'broadcast' || lower === 'send') {
-                    broadcastTx();
-                } else if (lower === 'clear') {
-                    clearTerminal();
-                } else {
-                    printToTerminal(`Comando sconosciuto: '${cmd}'. Digita 'help'.`, true);
-                }
-            }
+        termInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') executeCommand();
         });
     </script>
 </body>

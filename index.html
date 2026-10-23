@@ -1,295 +1,288 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZDOS // Build what you can prove.</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;700&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZDOS Videotel & ZComm SLY Network</title>
+    <style>
+        :root {
+            --bg-color: #020205;
+            --term-bg: rgba(6, 6, 12, 0.95);
+            --primary: #00ffcc;
+            --secondary: #ff007f;
+            --accent: #bd00ff;
+            --text: #e0e0f0;
+            --border: #00ffcc44;
+        }
+        
+        /* Effetto CRT Videotel d'epoca */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.04));
+            z-index: 1000;
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+        }
 
-    :root {
-      --bg-base: #08090d;
-      --bg-card: #0e121b;
-      --bg-hover: #141b29;
-      --border: #1e293b;
-      --cyan: #00f3ff;
-      --green: #10b981;
-      --text-main: #f1f5f9;
-      --text-muted: #94a3b8;
-      --accent: #6366f1;
-    }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background-color: var(--bg-base); color: var(--text-main); font-family: 'Inter', sans-serif; line-height: 1.6; overflow-x: hidden; }
+        header { text-align: center; margin-bottom: 10px; z-index: 5; }
+        h1 { color: var(--primary); font-size: 1.2rem; margin: 0 0 3px 0; text-shadow: 0 0 10px var(--primary); letter-spacing: 2px; }
+        p.subtitle { color: var(--secondary); font-size: 0.68rem; margin: 0; letter-spacing: 1px; text-shadow: 0 0 5px var(--secondary); }
 
-    /* BACKGROUND GRID */
-    .grid-lines { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: linear-gradient(rgba(0, 243, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.02) 1px, transparent 1px); background-size: 40px 40px; z-index: -1; pointer-events: none; }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 12px;
+            width: 100%;
+            max-width: 1100px;
+            flex: 1;
+            z-index: 5;
+        }
+        @media (max-width: 800px) { .dashboard-grid { grid-template-columns: 1fr; } }
 
-    /* NAV */
-    nav { border-bottom: 1px solid var(--border); background: rgba(8, 9, 13, 0.85); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; padding: 18px 8%; display: flex; justify-content: space-between; align-items: center; }
-    .logo { font-weight: 700; font-size: 1.25rem; letter-spacing: -0.5px; color: var(--text-main); display: flex; align-items: center; gap: 8px; font-family: 'Fira Code', monospace; }
-    .logo span { color: var(--cyan); }
-    .nav-links { display: flex; gap: 25px; }
-    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; font-family: 'Fira Code', monospace; }
-    .nav-links a:hover { color: var(--cyan); }
+        .card {
+            background: var(--term-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.15), inset 0 0 10px rgba(0, 255, 204, 0.05);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
 
-    /* HERO */
-    .hero { padding: 100px 8% 60px; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 50px; align-items: center; }
-    .hero-content h1 { font-size: 3.5rem; font-weight: 700; line-height: 1.15; margin-bottom: 20px; letter-spacing: -1.5px; }
-    .hero-content h1 span { color: var(--cyan); }
-    .hero-content p { font-size: 1.15rem; color: var(--text-muted); margin-bottom: 30px; }
-    .quote-badge { display: inline-block; font-family: 'Fira Code', monospace; font-size: 0.85rem; color: var(--green); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 6px 12px; border-radius: 4px; margin-bottom: 20px; }
-    
-    .cta-group { display: flex; gap: 15px; }
-    .btn { padding: 12px 24px; font-weight: 600; font-size: 0.875rem; text-decoration: none; border-radius: 6px; transition: all 0.2s; font-family: 'Fira Code', monospace; display: inline-flex; align-items: center; gap: 8px; }
-    .btn-primary { background: var(--cyan); color: #000; box-shadow: 0 0 20px rgba(0,243,255,0.15); }
-    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn-outline { border: 1px solid var(--border); color: var(--text-main); background: var(--bg-card); }
-    .btn-outline:hover { border-color: var(--cyan); color: var(--cyan); }
+        .card-title {
+            color: var(--primary);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
 
-    /* TERMINAL PREVIEW WIDGET */
-    .terminal-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-    .terminal-header { background: #131824; padding: 10px 15px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
-    .dot { width: 10px; height: 10px; border-radius: 50%; }
-    .dot-red { background: #ef4444; } .dot-yellow { background: #f59e0b; } .dot-green { background: #10b981; }
-    .terminal-title { font-family: 'Fira Code', monospace; font-size: 0.75rem; color: var(--text-muted); margin-left: 10px; }
-    .terminal-body { padding: 20px; font-family: 'Fira Code', monospace; font-size: 0.85rem; color: #cbd5e1; line-height: 1.7; }
-    .t-step { color: var(--cyan); } .t-val { color: var(--green); }
+        .terminal-box {
+            background: #010104;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 10px;
+            height: 210px;
+            overflow-y: auto;
+            font-size: 0.76rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+            color: var(--text);
+            text-shadow: 0 0 4px var(--primary);
+            margin-bottom: 8px;
+        }
 
-    /* SECTIONS GENERAL */
-    .section { padding: 80px 8%; max-width: 1200px; margin: 0 auto; }
-    .section-header { margin-bottom: 50px; }
-    .section-header h2 { font-size: 2.2rem; font-weight: 700; letter-spacing: -1px; margin-bottom: 10px; }
-    .section-header p { color: var(--text-muted); font-size: 1.05rem; }
+        .input-group {
+            display: flex;
+            gap: 6px;
+        }
 
-    /* PIPELINE GRID */
-    .pipeline-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
-    .pipeline-card { background: var(--bg-card); border: 1px solid var(--border); padding: 25px; border-radius: 8px; position: relative; }
-    .pipeline-card:hover { border-color: var(--cyan); background: var(--bg-hover); }
-    .step-num { font-family: 'Fira Code', monospace; font-size: 0.75rem; color: var(--cyan); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
-    .pipeline-card h3 { font-size: 1.1rem; margin-bottom: 8px; font-weight: 600; }
-    .pipeline-card p { font-size: 0.9rem; color: var(--text-muted); }
+        input {
+            flex: 1;
+            background: #010104;
+            border: 1px solid var(--border);
+            color: var(--primary);
+            padding: 7px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.78rem;
+            border-radius: 4px;
+            outline: none;
+        }
 
-    /* STATUS WARNING BOX */
-    .status-box { background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2); border-left: 4px solid #f59e0b; padding: 25px; border-radius: 6px; margin-top: 40px; }
-    .status-box h4 { color: #f59e0b; font-family: 'Fira Code', monospace; margin-bottom: 8px; font-size: 1rem; }
-    .status-box p { font-size: 0.95rem; color: var(--text-muted); }
+        button {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 7px 10px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            box-shadow: 0 0 6px rgba(0, 255, 204, 0.2);
+        }
 
-    /* PILLARS & PROJECTS */
-    .duo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-    .card-list { display: flex; flex-direction: column; gap: 15px; }
-    .repo-card { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: 6px; text-decoration: none; color: inherit; display: block; transition: 0.2s; }
-    .repo-card:hover { border-color: var(--cyan); transform: translateX(5px); }
-    .repo-card h4 { color: var(--cyan); font-family: 'Fira Code', monospace; font-size: 1rem; margin-bottom: 5px; display: flex; justify-content: space-between; }
-    .repo-card p { font-size: 0.85rem; color: var(--text-muted); }
+        button:hover {
+            background: var(--primary);
+            color: var(--bg-color);
+            box-shadow: 0 0 12px var(--primary);
+        }
 
-    .pillar-item { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: 6px; margin-bottom: 15px; }
-    .pillar-item h4 { font-size: 1rem; margin-bottom: 5px; color: var(--text-main); }
-    .pillar-item p { font-size: 0.85rem; color: var(--text-muted); }
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 5px 8px;
+            border-radius: 4px;
+            border-left: 3px solid var(--secondary);
+        }
+        .metric-val { color: var(--primary); font-weight: bold; }
 
-    /* METHOD RULES */
-    .rules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-    .rule-card { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: 6px; text-align: center; }
-    .rule-card h5 { font-family: 'Fira Code', monospace; color: var(--green); margin-bottom: 8px; font-size: 0.95rem; }
-    .rule-card p { font-size: 0.8rem; color: var(--text-muted); }
-
-    /* QUICK NAVIGATION TO OTHER HUBS */
-    .hub-links { display: flex; gap: 15px; margin-top: 30px; }
-
-    /* FOOTER */
-    footer { border-top: 1px solid var(--border); background: var(--bg-card); padding: 40px 8%; display: flex; justify-content: space-between; align-items: center; margin-top: 80px; }
-    .footer-info { font-family: 'Fira Code', monospace; font-size: 0.8rem; color: var(--text-muted); }
-    .footer-info span { color: var(--cyan); }
-    .footer-links a { color: var(--text-muted); text-decoration: none; margin-left: 20px; font-size: 0.85rem; font-family: 'Fira Code', monospace; }
-    .footer-links a:hover { color: var(--cyan); }
-
-    @media (max-width: 900px) {
-      .hero { grid-template-columns: 1fr; padding-top: 60px; }
-      .duo-grid { grid-template-columns: 1fr; }
-      .hero-content h1 { font-size: 2.8rem; }
-    }
-  </style>
+        .videotel-keypad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin-top: 8px;
+        }
+        .key-btn {
+            background: rgba(0,255,204,0.05);
+            border: 1px solid var(--border);
+            color: var(--primary);
+            padding: 6px;
+            font-size: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .key-btn:hover { background: var(--primary); color: #000; }
+    </style>
 </head>
 <body>
-  <div class="grid-lines"></div>
 
-  <nav>
-    <div class="logo">Z-<span>DOS</span></div>
-    <div class="nav-links">
-      <a href="#pipeline">Pipeline</a>
-      <a href="#projects">Repository</a>
-      <a href="#method">Metodo</a>
-      <a href="https://zdos-sec.it" target="_blank">War Room</a>
-      <a href="https://zdos-hub.it/retro-computing.html" target="_blank" rel="noopener">ZRetro</a>
-    </div>
-  </nav>
+    <header>
+        <h1>ZDOS VIDEOTEL SLY — RETE MESH & DSN</h1>
+        <p class="subtitle">Utility di Comunicazione Sovrana | Nodo $DSN 0xfc9051...192c296</p>
+    </header>
 
-  <header class="hero">
-    <div class="hero-content">
-      <span class="quote-badge">Build what you can prove. ✨</span>
-      <h1>Modular systems you can <span>read, compile</span> & verify.</h1>
-      <p>Trasformiamo l'ecosistema ZDOS in una catena tecnica concreta: da un programma Zlang, al bytecode, al kernel bare-metal, fino all'esecuzione in QEMU.</p>
-      <div class="cta-group">
-        <a href="https://github.com/high-cde/ZDOS" target="_blank" class="btn btn-primary">GitHub Monorepo</a>
-        <a href="https://github.com/high-cde/ZDOS/releases/latest/download/zdos-x86_64.iso" class="btn btn-outline" download>Scarica ISO x86_64</a>
-        <a href="#pipeline" class="btn btn-outline">Esplora Pipeline</a>
-      </div>
-    </div>
-    
-    <div class="status-box" style="margin-top:0">
-      <h4>PROVA RIPRODUCIBILE</h4>
-      <p>La catena reale è nel codice e nella CI: il compilatore genera bytecode ZLB2, ZDOS lo incorpora e il workflow verifica il boot seriale in QEMU. Per riprodurla, seguire <a href="docs/zdos-x86_64-profile.md">il profilo ZDOS x86_64</a> e il workflow pubblico del repository.</p>
-    </div>
-  </header>
-
-  <!-- PIPELINE SECTION -->
-  <section id="pipeline" class="section">
-    <div class="section-header">
-      <h2>Una pipeline che esiste davvero</h2>
-      <p><a href="https://github.com/high-cde/ZDOS/releases/latest/download/zdos-x86_64.iso" class="btn btn-primary" download>Download ISO ZDOS x86_64 · Zlang v1</a></p>
-      <p>Dalla specifica testuale al boot di sistema: ogni transizione è un contratto verificabile.</p>
-    </div>
-
-    <div class="pipeline-grid">
-      <div class="pipeline-card">
-        <span class="step-num">Passaggio 01</span>
-        <h3>Zlang</h3>
-        <p>Un programma <code>emit &lt;testo&gt;</code> viene descritto direttamente in file <code>.zlang</code>.</p>
-      </div>
-      <div class="pipeline-card">
-        <span class="step-num">Passaggio 02</span>
-        <h3>Bytecode</h3>
-        <p>Il compilatore <code>zlangc.py</code> genera un formato binario versionato e validabile.</p>
-      </div>
-      <div class="pipeline-card">
-        <span class="step-num">Passaggio 03</span>
-        <h3>Kernel</h3>
-        <p>Il bytecode viene incorporato ed eseguito dal kernel bare-metal ZDOS x86_64.</p>
-      </div>
-      <div class="pipeline-card">
-        <span class="step-num">Passaggio 04</span>
-        <h3>Boot & Verifica</h3>
-        <p>GRUB crea l'ISO e QEMU verifica l'output seriale tramite Workflow CI automatizzato.</p>
-      </div>
-    </div>
-
-    <div class="status-box">
-      <h4>⚠️ STATO PRECISO DEL PROTOTIPO</h4>
-      <p>ZDOS è attualmente un <strong>prototipo x86_64 avviabile</strong>, non un sistema operativo generale. Gestione processi, filesystem, rete, driver, loader esterno e syscall pubbliche sono tappe future e pianificate, non promesse premature.</p>
-    </div>
-  </section>
-
-  <!-- REPOSITORIES & PILLARS -->
-  <section id="projects" class="section">
-    <div class="section-header">
-      <h2>Ecosistema & Repository</h2>
-      <p>L'architettura modulare suddivisa nei componenti ufficiali dell'organizzazione high-cde.</p>
-    </div>
-
-    <div class="duo-grid">
-      <div class="card-list">
-        <h3 style="font-family:'Fira Code'; font-size: 1.1rem; margin-bottom: 10px; color: var(--cyan);">📂 Repository Principali</h3>
-        
-        <a href="https://github.com/high-cde/ZDOS" target="_blank" class="repo-card">
-          <h4>ZDOS <span>↗</span></h4>
-          <p>Monorepo dell'ecosistema; include il prototipo bare-metal x86_64 avviabile in QEMU.</p>
-        </a>
-        
-        <a href="https://github.com/high-cde/Zlang" target="_blank" class="repo-card">
-          <h4>Zlang <span>↗</span></h4>
-          <p>Linguaggio applicativo e compilatore ZLB2 v2.5 usato dalla pipeline ZDOS.</p>
-        </a>
-        
-        <a href="https://github.com/high-cde/zdos-organism" target="_blank" class="repo-card">
-          <h4>zdos-organism <span>↗</span></h4>
-          <p>Workspace sperimentale Rust/Python per runtime, VM e componenti osservabili.</p>
-        </a>
-
-        <a href="https://github.com/high-cde/ZCORE" target="_blank" class="repo-card">
-          <h4>ZCORE <span>↗</span></h4>
-          <p>Esperimenti avanzati sul nucleo e sull'identità logica del sistema ZDOS.</p>
-        </a>
-
-        <a href="https://github.com/high-cde/Z-CYBERCORE" target="_blank" class="repo-card">
-          <h4>Z-CYBERCORE <span>↗</span></h4>
-          <p>Ricerca e tooling per la sicurezza in contesti autorizzati e difensivi.</p>
-        </a>
-
-        <a href="https://github.com/high-cde/xCLOUD-by-zdos" target="_blank" class="repo-card">
-          <h4>xCLOUD-by-zdos <span>↗</span></h4>
-          <p>Layer cloud e interfacce enterprise dell'ecosistema ZDOS.</p>
-        </a>
-      </div>
-
-      <div>
-        <h3 style="font-family:'Fira Code'; font-size: 1.1rem; margin-bottom: 10px; color: var(--green);">🧠 Direzione Tecnica & Pilastri</h3>
-        
-        <div class="pillar-item">
-          <h4>Sistemi Intelligenti</h4>
-          <p>Orchestrazione, memoria e componenti modulari. Separare rigorosamente il comportamento dal contesto di esecuzione.</p>
-        </div>
-        <div class="pillar-item">
-          <h4>Automazione & Toolchain</h4>
-          <p>CLI, wrapper e pipeline ripetibili. Un comando deve sempre produrre un effetto osservabile e verificabile.</p>
-        </div>
-        <div class="pillar-item">
-          <h4>Sicurezza Difensiva</h4>
-          <p>Ambienti controllati, policy e test negativi. Approccio default-deny, minimo privilegio e totale auditabilità.</p>
-        </div>
-        <div class="pillar-item">
-          <h4>Web & Cloud Integration</h4>
-          <p>Dashboard, interfacce operative e servizi di supporto con documentazione e componenti riusabili.</p>
+    <div class="dashboard-grid">
+        <!-- Pannello 1: Terminale Videotel ZComm -->
+        <div class="card">
+            <div class="card-title">
+                <span>VIDEOTEL COMM TERMINAL (ZComm)</span>
+                <span style="color: #27c93f;">● CONNESSO</span>
+            </div>
+            <div id="termOutput" class="terminal-box">ZDOS Videotel v2026.2 avviato.
+Benvenuto nel sistema di messaggistica e dati stile SIP.
+Digita un comando o usa i tasti rapidi del Videotel.
+</div>
+            <div class="input-group">
+                <input type="text" id="termInput" placeholder="Inserisci comando o codice Videotel..." autocomplete="off">
+                <button onclick="executeCommand()">Invia</button>
+            </div>
+            <div class="videotel-keypad">
+                <div class="key-btn" onclick="sendCode('1')">1: SERVIZI</div>
+                <div class="key-btn" onclick="sendCode('2')">2: $DSN CHAT</div>
+                <div class="key-btn" onclick="sendCode('3')">3: ZVL YIELD</div>
+                <div class="key-btn" onclick="sendCode('4')">4: MESH STATS</div>
+            </div>
         </div>
 
-        <div class="hub-links">
-          <a href="https://zdos-sec.it" target="_blank" class="btn btn-outline" style="flex:1; justify-content:center;">🛡️ War Room (Sec)</a>
-          <a href="https://zdos-hub.it" target="_blank" class="btn btn-outline" style="flex:1; justify-content:center; border-color:#f59e0b; color:#f59e0b;">🕹️ Retro Hub</a>
+        <!-- Pannello 2: DApp SLY & $DSN Gateway -->
+        <div class="card">
+            <div class="card-title">
+                <span>SLY / $DSN UTILITY GATEWAY</span>
+                <span style="color: var(--secondary);">vRAM State</span>
+            </div>
+            <div style="flex: 1;">
+                <div class="metric-row">
+                    <span>Gateway $DSN:</span>
+                    <span class="metric-val" style="font-size: 0.65rem; color: var(--secondary);">0xfc90...296</span>
+                </div>
+                <div class="metric-row">
+                    <span>Utility ZVL (Rescue/Comm):</span>
+                    <span id="zvlBalance" class="metric-val">12,500 ZVL</span>
+                </div>
+                <div class="metric-row">
+                    <span>Canale Videotel Attivo:</span>
+                    <span class="metric-val">#8333 (ZComm Mesh)</span>
+                </div>
+                <div class="metric-row">
+                    <span>Stato State Trie:</span>
+                    <span class="metric-val" style="color: #27c93f;">Sincronizzato ✅</span>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <button style="flex: 1; border-color: var(--secondary); color: var(--secondary);" onclick="openVideotelChannel()">Apri Videotel</button>
+                <button style="flex: 1;" onclick="burnZvlUtility()">Usa ZVL Utility</button>
+            </div>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- METHOD -->
-  <section id="method" class="section">
-    <div class="section-header">
-      <h2>Metodo di Lavoro</h2>
-      <p>Progettare → implementare → testare → documentare → pubblicare.</p>
     </div>
 
-    <div class="rules-grid">
-      <div class="rule-card">
-        <h5>✅ Verificabile</h5>
-        <p>Build, test e output devono poter essere replicati da chiunque.</p>
-      </div>
-      <div class="rule-card">
-        <h5>🔒 Esplicita</h5>
-        <p>Le capability di sistema devono essere ristrette e documentate.</p>
-      </div>
-      <div class="rule-card">
-        <h5>🧱 Modulare</h5>
-        <p>Ogni livello ha confini e responsabilità rigorosamente definiti.</p>
-      </div>
-      <div class="rule-card">
-        <h5>📚 Educativa</h5>
-        <p>Il percorso dal concetto alla macchina resta sempre leggibile.</p>
-      </div>
-      <div class="rule-card">
-        <h5>🚀 Incrementale</h5>
-        <p>Le promesse seguono prove concrete, mai le anticipano.</p>
-      </div>
-    </div>
-  </section>
+    <script>
+        const termOutput = document.getElementById('termOutput');
+        const termInput = document.getElementById('termInput');
+        const zvlBalance = document.getElementById('zvlBalance');
+        let zvlAmount = 12500;
 
-  <footer>
-    <div class="footer-info">
-      Architected & Maintained by <span>zdos</span><br>
-      Contact: <span>Highkali13@proton.me</span>
-    </div>
-    <div class="footer-links">
-      <a href="https://github.com/high-cde" target="_blank">GitHub</a>
-      <a href="https://zdos-sec.it" target="_blank">Zdos-Sec</a>
-      <a href="https://zdos-hub.it" target="_blank">Zdos-Hub</a>
-    </div>
-  </footer>
+        function logTerm(text, isErr = false) {
+            termOutput.innerHTML += `<span style="color: ${isErr ? '#ff5f56' : 'inherit'}">${text}</span>\n`;
+            termOutput.scrollTop = termOutput.scrollHeight;
+        }
+
+        function executeCommand() {
+            const cmd = termInput.value.trim().toLowerCase();
+            if (!cmd) return;
+            logTerm(`videotel@dsn:~$ ${cmd}`);
+            termInput.value = '';
+
+            if (cmd === 'help' || cmd === '1') {
+                logTerm("--- MENU VIDEOTEL ZDOS ---");
+                logTerm("  [2] $DSN Chat cifrata P2P");
+                logTerm("  [3] Utility ZVL (Canale di soccorso/comunicazione)");
+                logTerm("  [4] Stato nodi Mesh ZComm");
+            } else if (cmd === '2' || cmd === 'chat') {
+                logTerm("[*] Connessione al canale $DSN 0xfc90...192c296...");
+                logTerm("[+] Canale Videotel sicuro stabilito via ZComm Mesh. Pronto a trasmettere.");
+            } else if (cmd === '3' || cmd === 'zvl') {
+                logTerm("[*] Attivazione Utility ZVL: Banda di emergenza e routing dati attivi.");
+            } else if (cmd === '4' || cmd === 'status') {
+                logTerm("Gateway $DSN online. Latenza Mesh: 0.14ms. vRAM protetta.");
+            } else {
+                logTerm(`Comando / Codice non valido: ${cmd}`, true);
+            }
+        }
+
+        function sendCode(code) {
+            termInput.value = code;
+            executeCommand();
+        }
+
+        function openVideotelChannel() {
+            logTerm("\n[Videotel] Inizializzazione terminale grafico stile Minitel/SIP...");
+            setTimeout(() => {
+                logTerm("[+] Connesso al nodo $DSN 0xfc90516a1f736FaC557e09D8853dB80dA192c296");
+                logTerm("[+] Canale di comunicazione ZVL aperto. Trasmissione pacchetti .zbag attiva. 📞⚡️\n");
+            }, 400);
+        }
+
+        function burnZvlUtility() {
+            logTerm("\n[ZVL Utility] Allocazione bandwidth di soccorso via $DSN...");
+            setTimeout(() => {
+                zvlAmount -= 500;
+                zvlBalance.textContent = zvlAmount.toLocaleString() + " ZVL";
+                logTerm("[+] Transazione utility completata. -500 ZVL impiegati per il routing di emergenza. ✅\n");
+            }, 400);
+        }
+
+        termInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') executeCommand();
+        });
+    </script>
 </body>
 </html>
