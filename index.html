@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZDOS Videotel & ZComm SLY Network</title>
+    <title>ZDOS Sovereign Videotel & Mining Hub</title>
     <style>
         :root {
             --bg-color: #020205;
@@ -42,12 +42,41 @@
         }
 
         header { text-align: center; margin-bottom: 10px; z-index: 5; }
-        h1 { color: var(--primary); font-size: 1.2rem; margin: 0 0 3px 0; text-shadow: 0 0 10px var(--primary); letter-spacing: 2px; }
-        p.subtitle { color: var(--secondary); font-size: 0.68rem; margin: 0; letter-spacing: 1px; text-shadow: 0 0 5px var(--secondary); }
+        h1 { color: var(--primary); font-size: 1.15rem; margin: 0 0 3px 0; text-shadow: 0 0 10px var(--primary); letter-spacing: 2px; }
+        p.subtitle { color: var(--secondary); font-size: 0.65rem; margin: 0; letter-spacing: 1px; text-shadow: 0 0 5px var(--secondary); }
+
+        /* Barra Connettori Superiori (GitHub, Discord, ZDOS) */
+        .connectors-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            z-index: 5;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .conn-btn {
+            background: rgba(0, 255, 204, 0.05);
+            border: 1px solid var(--border);
+            color: var(--primary);
+            padding: 5px 10px;
+            font-size: 0.7rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+        .conn-btn:hover {
+            background: var(--primary);
+            color: var(--bg-color);
+            box-shadow: 0 0 10px var(--primary);
+        }
 
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 1.2fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
             width: 100%;
             max-width: 1100px;
@@ -69,7 +98,7 @@
 
         .card-title {
             color: var(--primary);
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             border-bottom: 1px solid var(--border);
             padding-bottom: 5px;
@@ -84,9 +113,9 @@
             border: 1px solid var(--border);
             border-radius: 4px;
             padding: 10px;
-            height: 210px;
+            height: 190px;
             overflow-y: auto;
-            font-size: 0.76rem;
+            font-size: 0.74rem;
             white-space: pre-wrap;
             word-break: break-all;
             color: var(--text);
@@ -106,27 +135,29 @@
             color: var(--primary);
             padding: 7px;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 0.78rem;
+            font-size: 0.76rem;
             border-radius: 4px;
             outline: none;
         }
 
-        button {
+        button, .action-link-btn {
             background: transparent;
             border: 1px solid var(--primary);
             color: var(--primary);
             padding: 7px 10px;
             cursor: pointer;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             border-radius: 4px;
             font-weight: bold;
             text-transform: uppercase;
             transition: all 0.2s;
             box-shadow: 0 0 6px rgba(0, 255, 204, 0.2);
+            text-decoration: none;
+            text-align: center;
         }
 
-        button:hover {
+        button:hover, .action-link-btn:hover {
             background: var(--primary);
             color: var(--bg-color);
             box-shadow: 0 0 12px var(--primary);
@@ -136,7 +167,7 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 6px;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             background: rgba(255, 255, 255, 0.02);
             padding: 5px 8px;
             border-radius: 4px;
@@ -147,15 +178,15 @@
         .videotel-keypad {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
-            margin-top: 8px;
+            gap: 4px;
+            margin-top: 6px;
         }
         .key-btn {
             background: rgba(0,255,204,0.05);
             border: 1px solid var(--border);
             color: var(--primary);
-            padding: 6px;
-            font-size: 0.75rem;
+            padding: 5px;
+            font-size: 0.7rem;
             text-align: center;
             cursor: pointer;
             border-radius: 3px;
@@ -166,9 +197,17 @@
 <body>
 
     <header>
-        <h1>ZDOS VIDEOTEL SLY — RETE MESH & DSN</h1>
-        <p class="subtitle">Utility di Comunicazione Sovrana | Nodo $DSN 0xfc9051...192c296</p>
+        <h1>ZDOS SOVEREIGN VIDEOTEL & MINING HUB</h1>
+        <p class="subtitle">Comunicazione ZComm | Gateway $DSN: 0xfc9051...192c296</p>
     </header>
+
+    <!-- Connettori Ufficiali GitHub, Discord, ZDOS -->
+    <div class="connectors-bar">
+        <a class="conn-btn" href="https://github.com/high-cde/Zlang" target="_blank">🔗 GitHub Core</a>
+        <a class="conn-btn" href="https://github.com/high-cde/Zlang/tree/main/miner" target="_blank">⛏️ GitHub Miniera</a>
+        <a class="conn-btn" href="https://discord.gg/zdos" target="_blank">💬 Discord Node</a>
+        <a class="conn-btn" href="https://x-zdos.it" target="_blank">🛡️ ZDOS Ecosystem</a>
+    </div>
 
     <div class="dashboard-grid">
         <!-- Pannello 1: Terminale Videotel ZComm -->
@@ -178,11 +217,11 @@
                 <span style="color: #27c93f;">● CONNESSO</span>
             </div>
             <div id="termOutput" class="terminal-box">ZDOS Videotel v2026.2 avviato.
-Benvenuto nel sistema di messaggistica e dati stile SIP.
-Digita un comando o usa i tasti rapidi del Videotel.
+Canale SIP cifrato attivo con il nodo $DSN.
+Digita comandi o usa i tasti rapidi sottostanti.
 </div>
             <div class="input-group">
-                <input type="text" id="termInput" placeholder="Inserisci comando o codice Videotel..." autocomplete="off">
+                <input type="text" id="termInput" placeholder="Comando o codice Videotel..." autocomplete="off">
                 <button onclick="executeCommand()">Invia</button>
             </div>
             <div class="videotel-keypad">
@@ -193,33 +232,33 @@ Digita un comando o usa i tasti rapidi del Videotel.
             </div>
         </div>
 
-        <!-- Pannello 2: DApp SLY & $DSN Gateway -->
+        <!-- Pannello 2: Dashboard Separata ZDOS Hybrid Miner -->
         <div class="card">
             <div class="card-title">
-                <span>SLY / $DSN UTILITY GATEWAY</span>
-                <span style="color: var(--secondary);">vRAM State</span>
+                <span>ZDOS Hybrid Miner Hub</span>
+                <span style="color: var(--secondary);">Proof-of-Work</span>
             </div>
             <div style="flex: 1;">
                 <div class="metric-row">
-                    <span>Gateway $DSN:</span>
-                    <span class="metric-val" style="font-size: 0.65rem; color: var(--secondary);">0xfc90...296</span>
+                    <span>Stato Miniera (PoW):</span>
+                    <span class="metric-val" style="color: #27c93f;">Blocco #1 Minato ✅</span>
                 </div>
                 <div class="metric-row">
-                    <span>Utility ZVL (Rescue/Comm):</span>
-                    <span id="zvlBalance" class="metric-val">12,500 ZVL</span>
+                    <span>Ultimo Hash Valido:</span>
+                    <span class="metric-val" style="font-size: 0.65rem;">00003d3b...5460</span>
                 </div>
                 <div class="metric-row">
-                    <span>Canale Videotel Attivo:</span>
-                    <span class="metric-val">#8333 (ZComm Mesh)</span>
+                    <span>Nonce di Soluzione:</span>
+                    <span class="metric-val">78,068</span>
                 </div>
                 <div class="metric-row">
-                    <span>Stato State Trie:</span>
-                    <span class="metric-val" style="color: #27c93f;">Sincronizzato ✅</span>
+                    <span>Difficoltà Rete Mesh:</span>
+                    <span class="metric-val">0000 (ZComm Port 8333)</span>
                 </div>
             </div>
-            <div style="display: flex; gap: 8px; margin-top: 8px;">
-                <button style="flex: 1; border-color: var(--secondary); color: var(--secondary);" onclick="openVideotelChannel()">Apri Videotel</button>
-                <button style="flex: 1;" onclick="burnZvlUtility()">Usa ZVL Utility</button>
+            <div style="display: flex; gap: 6px; margin-top: 8px;">
+                <a class="action-link-btn" style="flex: 1; border-color: var(--secondary); color: var(--secondary);" href="https://github.com/high-cde/Zlang/tree/main/miner" target="_blank">Repo Miniera</a>
+                <button style="flex: 1;" onclick="triggerMining()">Avvia Miner</button>
             </div>
         </div>
     </div>
@@ -227,8 +266,6 @@ Digita un comando o usa i tasti rapidi del Videotel.
     <script>
         const termOutput = document.getElementById('termOutput');
         const termInput = document.getElementById('termInput');
-        const zvlBalance = document.getElementById('zvlBalance');
-        let zvlAmount = 12500;
 
         function logTerm(text, isErr = false) {
             termOutput.innerHTML += `<span style="color: ${isErr ? '#ff5f56' : 'inherit'}">${text}</span>\n`;
@@ -242,19 +279,19 @@ Digita un comando o usa i tasti rapidi del Videotel.
             termInput.value = '';
 
             if (cmd === 'help' || cmd === '1') {
-                logTerm("--- MENU VIDEOTEL ZDOS ---");
+                logTerm("--- COMANDI VIDEOTEL ZDOS ---");
                 logTerm("  [2] $DSN Chat cifrata P2P");
-                logTerm("  [3] Utility ZVL (Canale di soccorso/comunicazione)");
-                logTerm("  [4] Stato nodi Mesh ZComm");
+                logTerm("  [3] Utility ZVL (Banda di emergenza)");
+                logTerm("  [4] Stato nodi Mesh ZComm & Miner");
             } else if (cmd === '2' || cmd === 'chat') {
-                logTerm("[*] Connessione al canale $DSN 0xfc90...192c296...");
-                logTerm("[+] Canale Videotel sicuro stabilito via ZComm Mesh. Pronto a trasmettere.");
+                logTerm("[*] Apertura canale sicuro $DSN (0xfc9051...192c296)...");
+                logTerm("[+] Connessione Videotel stabilita via ZComm Mesh. 📞");
             } else if (cmd === '3' || cmd === 'zvl') {
-                logTerm("[*] Attivazione Utility ZVL: Banda di emergenza e routing dati attivi.");
+                logTerm("[*] Utility ZVL attiva: routing pacchetti .zbag in corso.");
             } else if (cmd === '4' || cmd === 'status') {
-                logTerm("Gateway $DSN online. Latenza Mesh: 0.14ms. vRAM protetta.");
+                logTerm("Gateway $DSN online. Miner Blocco #1 sincronizzato con successo.");
             } else {
-                logTerm(`Comando / Codice non valido: ${cmd}`, true);
+                logTerm(`Comando non riconosciuto: ${cmd}`, true);
             }
         }
 
@@ -263,21 +300,12 @@ Digita un comando o usa i tasti rapidi del Videotel.
             executeCommand();
         }
 
-        function openVideotelChannel() {
-            logTerm("\n[Videotel] Inizializzazione terminale grafico stile Minitel/SIP...");
+        function triggerMining() {
+            logTerm("\n[ZDOS Miner] Avvio simulazione Proof-of-Work locale...");
             setTimeout(() => {
-                logTerm("[+] Connesso al nodo $DSN 0xfc90516a1f736FaC557e09D8853dB80dA192c296");
-                logTerm("[+] Canale di comunicazione ZVL aperto. Trasmissione pacchetti .zbag attiva. 📞⚡️\n");
-            }, 400);
-        }
-
-        function burnZvlUtility() {
-            logTerm("\n[ZVL Utility] Allocazione bandwidth di soccorso via $DSN...");
-            setTimeout(() => {
-                zvlAmount -= 500;
-                zvlBalance.textContent = zvlAmount.toLocaleString() + " ZVL";
-                logTerm("[+] Transazione utility completata. -500 ZVL impiegati per il routing di emergenza. ✅\n");
-            }, 400);
+                logTerm("[+] Calcolo nonce in corso... Difficoltà target: 0000");
+                logTerm("[+] Blocco validato! Hash: 00008f1a... Broadcast Mesh OK. 🎉\n");
+            }, 600);
         }
 
         termInput.addEventListener('keydown', (e) => {
