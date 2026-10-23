@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZDOS Sovereign Terminal & vCPU CLI</title>
+    <style>
+        :root {
+            --bg-color: #05050a;
+            --term-bg: rgba(10, 10, 20, 0.85);
+            --primary: #00ffcc;
+            --secondary: #ff007f;
+            --text: #c0c0d0;
+            --border: #00ffcc44;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin: 0 0 5px 0;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
+        }
+        p.subtitle {
+            color: var(--secondary);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        .terminal-container {
+            width: 100%;
+            max-width: 900px;
+            height: 70vh;
+            background: var(--term-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .terminal-header {
+            background: rgba(0, 255, 204, 0.1);
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+            color: var(--primary);
+        }
+        .dots {
+            display: flex;
+            gap: 6px;
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
+        
+        .terminal-output {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        .terminal-input-line {
+            display: flex;
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-top: 1px solid var(--border);
+            align-items: center;
+        }
+        .prompt {
+            color: var(--secondary);
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        input#commandInput {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1rem;
+            outline: none;
+        }
+        .actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 16px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: var(--primary);
+            color: var(--bg-color);
+            box-shadow: 0 0 10px var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ZDOS SOVEREIGN NODE CLI</h1>
+        <p class="subtitle">ZLang vCPU & State Trie Simulator (Web Environment)</p>
+    </header>
+
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <div class="dots">
+                <div class="dot dot-red"></div>
+                <div class="dot dot-yellow"></div>
+                <div class="dot dot-green"></div>
+            </div>
+            <span>vmi3082470@zdos-node:~</span>
+            <span>vRAM: 4KB Active</span>
+        </div>
+        <div id="output" class="terminal-output">Benvenuto nella CLI di ZDOS & vCPU v2026.2.
+Digita 'help' per visualizzare i comandi disponibili o 'run' per eseguire lo script di transazione di default.
+</div>
+        <div class="terminal-input-line">
+            <span class="prompt">zdos@high-cde:~$</span>
+            <input type="text" id="commandInput" autofocus autocomplete="off" placeholder="Digita un comando...">
+        </div>
+    </div>
+
+    <div class="actions">
+        <button onclick="runDefaultTx()">Esegui Transazione Chain</button>
+        <button onclick="clearTerminal()">Pulisci Terminale</button>
+        <button onclick="showRegisters()">Stato Registri vCPU</button>
+    </div>
+
+    <script>
+        const output = document.getElementById('output');
+        const input = document.getElementById('commandInput');
+
+        // Stato fittizio dei registri e della vRAM per la Web CLI
+        let vcpuState = {
+            registers: { r1: 100000, r2: 2500, r3: 97500 },
+            vram: { "0x0100": 97500, "0x0108": 2500 }
+        };
+
+        function printToTerminal(text, isError = false) {
+            output.innerHTML += `<span style="color: ${isError ? '#ff5f56' : 'inherit'}">${text}</span>\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function runDefaultTx() {
+            printToTerminal("\n[ZDOS vCPU] Avvio esecuzione transazione nativa State Trie...");
+            setTimeout(() => {
+                printToTerminal('[vCPU] R1 = 100000 (LOAD IMM)');
+                printToTerminal('[vCPU vRAM] Salvato R1 (100000) all\'indirizzo vRAM 0x0100');
+                printToTerminal('[vCPU OUT] Registro R1 = 100000');
+            }, 300);
+            setTimeout(() => {
+                printToTerminal('[vCPU] R2 = 2500 (LOAD IMM)');
+                printToTerminal('[vCPU vRAM] Salvato R2 (2500) all\'indirizzo vRAM 0x0108');
+                printToTerminal('[vCPU OUT] Registro R2 = 2500');
+            }, 600);
+            setTimeout(() => {
+                printToTerminal('[vCPU] R1 = R1 - R2 (Valore: 97500)');
+                printToTerminal('[vCPU vRAM] Salvato R1 (97500) all\'indirizzo vRAM 0x0100');
+                printToTerminal('[vCPU OUT] Registro R1 = 97500');
+                printToTerminal('[vCPU] HALT raggiunto');
+                printToTerminal('[ZDOS vCPU] Esecuzione transazione State Trie completata con successo. ✅\n', false);
+            }, 900);
+        }
+
+        function showRegisters() {
+            printToTerminal("\n--- STATO REGISTRI vCPU & vRAM ---");
+            printToTerminal(`R1 (sovereign_balance): ${vcpuState.registers.r1}`);
+            printToTerminal(`R2 (transfer_amount):   ${vcpuState.registers.r2}`);
+            printToTerminal(`vRAM [0x0100]:          ${vcpuState.vram["0x0100"]}`);
+            printToTerminal(`vRAM [0x0108]:          ${vcpuState.vram["0x0108"]}`);
+            printToTerminal("------------------------------------\n");
+        }
+
+        function clearTerminal() {
+            output.innerHTML = "Terminal cleared.\n";
+        }
+
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const cmd = input.value.trim();
+                if (!cmd) return;
+                
+                printToTerminal(`zdos@high-cde:~$ ${cmd}`);
+                input.value = '';
+
+                const lower = cmd.toLowerCase();
+                if (lower === 'help') {
+                    printToTerminal("Comandi disponibili:");
+                    printToTerminal("  run      - Esegue la transazione nativa della chain");
+                    printToTerminal("  regs     - Mostra lo stato dei registri vCPU");
+                    printToTerminal("  clear    - Pulisce lo schermo");
+                    printToTerminal("  version  - Mostra la versione del runtime ZLB2\n");
+                } else if (lower === 'run') {
+                    runDefaultTx();
+                } else if (lower === 'regs' || lower === 'registers') {
+                    showRegisters();
+                } else if (lower === 'clear') {
+                    clearTerminal();
+                } else if (lower === 'version') {
+                    printToTerminal("ZDOS Sovereign Kernel v2026.2.0 | ZLang Compiler v2.0\n");
+                } else {
+                    printToTerminal(`Comando sconosciuto: '${cmd}'. Digita 'help' per la lista comandi.`, true);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

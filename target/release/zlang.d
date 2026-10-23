@@ -1,1 +1,1 @@
-/root/modules/Zlang/target/release/zlang: /root/modules/Zlang/src/compiler/mod.rs /root/modules/Zlang/src/lib.rs /root/modules/Zlang/src/main.rs /root/modules/Zlang/src/vm/mod.rs
+/root/zdos/github_workspace/Zlang/target/release/zlang: /root/zdos/github_workspace/Zlang/src/compiler/mod.rs /root/zdos/github_workspace/Zlang/src/lib.rs /root/zdos/github_workspace/Zlang/src/main.rs /root/zdos/github_workspace/Zlang/src/vm/cpu.rs /root/zdos/github_workspace/Zlang/src/vm/mod.rs
