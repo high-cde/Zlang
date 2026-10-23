@@ -1,0 +1,8 @@
+{
+  "protocol": "ZDOS-SLY-EVM",
+  "address": "0x447f4a2647a7c6b7fde3465db812e1c6cb127042",
+  "private_key": "bb74724a7985ffbd915584c34d5f17b4ae5d368dbdab2d867605e647906f67c8",
+  "mnemonic": "west industry confirm muffin stadium catch tissue noise slow tube island chicken",
+  "compatible": ["MetaMask", "Coinomi", "RandomX-Pools"],
+  "version": "2026.2"
+}
