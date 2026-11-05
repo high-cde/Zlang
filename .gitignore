@@ -1,0 +1,5 @@
+# zdos-dsn-code-align v1: wallet generato a runtime da `create-wallet`, mai in git
+node_wallet.zbag
+*.zbag.key
+# zdos-dsn-code-align v1: build Rust
+target/
